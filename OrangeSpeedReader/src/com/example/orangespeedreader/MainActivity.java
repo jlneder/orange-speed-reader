@@ -3,6 +3,7 @@ package com.example.orangespeedreader;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,27 @@ public class MainActivity extends Activity {
 
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-               
+            	
+            	if (position == 0){
+		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	startActivity(wordPlayer);
+            	}
+            	else if (position == 1){
+		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	startActivity(wordPlayer);
+            	}
+            	else if (position == 2){
+		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	startActivity(wordPlayer);
+            	}else if (position == 3){
+		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	startActivity(wordPlayer);
+            	}
+            	else if (position == 4){
+		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	startActivity(wordPlayer);
+            	}
+            	
             	Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show();
             }
         });

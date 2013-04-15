@@ -14,12 +14,13 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:numColumns="2" 
         android:columnWidth="90dp"
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:numColumns="2"
+        android:stretchMode="columnWidth"
         android:verticalSpacing="10dp"
-    	android:horizontalSpacing="10dp"
-	    android:stretchMode="columnWidth"
-	    android:gravity="center" >
+        tools:listitem="@android:layout/simple_list_item_1" >
     
     </GridView>
 

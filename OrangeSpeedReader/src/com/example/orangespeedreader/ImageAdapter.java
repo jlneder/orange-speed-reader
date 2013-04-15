@@ -64,7 +64,7 @@ public class ImageAdapter extends BaseAdapter {
 
 	    // references to our images
 	    private Integer[] buttonID = {
-	            R.drawable.ic_launcher, R.drawable.ic_launcher,
+	            R.drawable.ic_launcher, android.R.drawable.btn_star,
 	            R.drawable.ic_launcher, R.drawable.ic_launcher,
 	            R.drawable.ic_launcher, R.drawable.ic_launcher,
 	            
