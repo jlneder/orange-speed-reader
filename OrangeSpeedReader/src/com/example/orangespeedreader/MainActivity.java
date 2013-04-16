@@ -41,12 +41,17 @@ public class MainActivity extends Activity {
 		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
 		        	startActivity(wordPlayer);
             	}else if (position == 3){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	Intent wordPlayer = new Intent(getApplicationContext(), SettingsActivity.class);
 		        	startActivity(wordPlayer);
             	}
             	else if (position == 4){
 		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
 		        	startActivity(wordPlayer);
+            	}
+            	else if (position == 5){ //exit
+		        	//Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	 finish();
+		             System.exit(0);
             	}
             	
             	Toast.makeText(MainActivity.this, "" + position, Toast.LENGTH_SHORT).show();

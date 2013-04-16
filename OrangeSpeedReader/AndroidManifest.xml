@@ -32,6 +32,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.orangespeedreader.MainActivity" />
         </activity>
+        <activity
+            android:name="com.example.orangespeedreader.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name="com.example.orangespeedreader.BtnBox"
+            android:label="@string/title_activity_btn_box" >
+        </activity>
     </application>
 
 </manifest>
