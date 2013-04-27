@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 <resources>
 
     <color name="black_overlay">#66000000</color>
 
+=======
+<resources>
+
+    <color name="black_overlay">#66000000</color>
+
+>>>>>>> d824a39f10c572722089c990b56f9ae453f20778
 </resources>

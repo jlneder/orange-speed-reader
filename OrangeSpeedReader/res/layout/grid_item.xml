@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -17,4 +18,23 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"/>
 
+=======
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical" android:gravity="center">
+
+<ImageView
+    android:id="@+id/btnPic"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/ic_launcher" />
+<TextView
+    android:id="@+id/btnText"
+    android:text="@string/read"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
+
+>>>>>>> d824a39f10c572722089c990b56f9ae453f20778
 </LinearLayout>
