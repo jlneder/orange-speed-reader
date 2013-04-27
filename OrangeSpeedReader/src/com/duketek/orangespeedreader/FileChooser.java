@@ -4,6 +4,7 @@ import java.io.File;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -70,8 +71,15 @@ public class FileChooser extends Activity {
 								Toast.LENGTH_LONG).show();
 						//start the word player using the picked file
 						Intent wordPlayerIntent = new Intent(getApplicationContext(), WordPlayerActivity.class);
+						
+						//load up shared prefs for storage
 						SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-						//SharedPreferences.Editor editor = new mPrefs.edit();
+						
+						//save the prefs
+						SharedPreferences.Editor prefsEditor = mPrefs.edit();
+						prefsEditor.putString("Recent", filePath );
+						prefsEditor.commit();
+						
 						startActivity(wordPlayerIntent);
 						
 					} catch (Exception e) {
