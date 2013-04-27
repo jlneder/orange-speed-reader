@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Orange Speed Reader</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_word_player">WordPlayerActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="percentage_bar">%</string>
+    <string name="words_per_minute">250</string>
+    <string name="pages">200/21256</string>
+    <string name="read">Read</string>
+    <string name="title_activity_btn_box">BtnBox</string>
+    <string name="title_activity_file_chooser">FileChooser</string>
+	
+</resources>
