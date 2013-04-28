@@ -15,8 +15,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
-
 import com.ipaulpro.afilechooser.utils.FileUtils;
+
+
 
 public class FileChooser extends Activity {
 
@@ -80,7 +81,7 @@ public class FileChooser extends Activity {
 						prefsEditor.putString("Recent", filePath );
 						prefsEditor.commit();
 						
-						startActivity(wordPlayerIntent);
+						//startActivity(wordPlayerIntent);
 						
 					} catch (Exception e) {
 						Log.e("FileSelectorTestActivity", "File select error",

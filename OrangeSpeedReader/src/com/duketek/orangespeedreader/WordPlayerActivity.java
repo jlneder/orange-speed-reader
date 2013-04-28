@@ -9,11 +9,23 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.support.v4.app.NavUtils;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -50,20 +62,104 @@ public class WordPlayerActivity extends Activity {
 	 */
 	private SystemUiHider mSystemUiHider;
 
-	private SharedPreferences mPrefs;
+	private static final String TAG = "WordPlayer";
 	
+	private SharedPreferences mPrefs;
+	private String mFilePath;
+	private Handler mHandler = new Handler();
+	private String[] mWords;
+	private String word;
+	
+	private TextView wordsTxtView;
+	
+	Runnable player = new Runnable(){
+		public void run(){
+			
+			//while words remaining
+			
+			//read in next word chunk
+			
+			//send words out to the wordplayer run
+			
+			if(mFilePath != null){
+				//load the file
+				//Scanner scan = new Scanner(filePath);
+				BufferedReader textReader = null;
+				try {
+					textReader = new BufferedReader(new FileReader(mFilePath));
+				}
+				catch (FileNotFoundException e) {
+					//popup the error
+	            	Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be loaded",Toast.LENGTH_LONG).show();
+					e.printStackTrace();
+				}
+
+				try {
+					String line = textReader.readLine();
+
+					//TODO make this regex changeable
+					Pattern splitRegex = Pattern.compile(" ");
+					while(line != null){
+
+						//grab the words from the line split it into an array based on the pattern
+						 mWords = splitRegex.split(line);
+
+						//TODO make impulse generator
+
+						 for(int i = 0 ; i < mWords.length ; i++){
+
+							 //get the chunk from the split and load it into word to be sent to TextView
+							 word = mWords[i]; 
+							 
+							 //load the words into the text view
+							 playWords();
+
+								
+						 }
+						 
+
+
+
+					}
+				} catch (IOException e) {
+	            	Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be read",Toast.LENGTH_LONG).show();
+					e.printStackTrace();
+				}
+
+
+
+			}
+
+
+			
+		}
+	};
+	
+	//method to run in a runnable loop
+	public void playWords(){
+		wordsTxtView.setText(word);
+        
+        //wpm/60000 = wpm in millis
+        int wpm = 60;
+        
+        mHandler.postDelayed(player, (wpm/60000) );
+    }
+	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		wordsTxtView = (TextView) findViewById(R.id.fullscreen_content);
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		mFilePath = mPrefs.getString("Name",null);
 		
-		SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
+		Log.d(TAG,"test");
 		
-		Bundle filePathExtra = getIntent().getExtras();
-		if (filePathExtra != null) {
-		    String filePath = filePathExtra.getString("ebook_file_path");
-		}
-
+		player.run();
+		
+		
+		
+		
 		setContentView(R.layout.activity_word_player);
 		setupActionBar();
 
