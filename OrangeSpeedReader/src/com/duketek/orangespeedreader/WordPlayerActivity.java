@@ -63,18 +63,19 @@ public class WordPlayerActivity extends Activity {
 	private SystemUiHider mSystemUiHider;
 
 	private static final String TAG = "WordPlayer";
-	
+	public static final String PREFS_NAME = "OrangeSettings";
+
 	private SharedPreferences mPrefs;
 	private String mFilePath;
 	private Handler mHandler = new Handler();
 	private String[] mWords;
-	private String word;
+	private String word = "OSR";
 	
 	private TextView wordsTxtView;
 	
-	Runnable player = new Runnable(){
-		public void run(){
-			
+//	private Runnable player = new Runnable(){
+//		public void run(){
+	private void player(){
 			//while words remaining
 			
 			//read in next word chunk
@@ -87,10 +88,11 @@ public class WordPlayerActivity extends Activity {
 				BufferedReader textReader = null;
 				try {
 					textReader = new BufferedReader(new FileReader(mFilePath));
+					Log.d(TAG, mFilePath+ " loaded");
 				}
 				catch (FileNotFoundException e) {
 					//popup the error
-	            	Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be loaded",Toast.LENGTH_LONG).show();
+	            	Toast.makeText(WordPlayerActivity.this,"Sorry, the file "+mFilePath+" could not be loaded",Toast.LENGTH_LONG).show();
 					e.printStackTrace();
 				}
 
@@ -112,15 +114,21 @@ public class WordPlayerActivity extends Activity {
 							 word = mWords[i]; 
 							 
 							 //load the words into the text view
-							 playWords();
-
-								
+							 
+							 mHandler.post(playWords);
+							 //playWords.run();
+							 
+							 //mHandler.postDelayed(this, 600000);
+							 
+							 if ( i == (mWords.length-1) ){
+								 //grab next line after the current one ran out
+								 line = textReader.readLine();
+							 }
+							 
 						 }
 						 
-
-
-
 					}
+					
 				} catch (IOException e) {
 	            	Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be read",Toast.LENGTH_LONG).show();
 					e.printStackTrace();
@@ -133,31 +141,50 @@ public class WordPlayerActivity extends Activity {
 
 			
 		}
-	};
+	//};
 	
 	//method to run in a runnable loop
-	public void playWords(){
-		wordsTxtView.setText(word);
-        
-        //wpm/60000 = wpm in millis
-        int wpm = 60;
-        
-        mHandler.postDelayed(player, (wpm/60000) );
-    }
+	private Runnable playWords = new Runnable()
+	{
+		public void run()
+		{
+	//private void playWords(){
 	
+			Log.d(TAG, word);
+			wordsTxtView.setText(word);
+
+			//wpm/60000 = wpm in millis
+			long wpm = 10;
+			long delay = wpm*60000;
+			try {
+				Thread.sleep(60000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//mHandler.postDelayed(this, 60000);
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		//make sure to set content so a null pointer exception does not get thrown by the findViewById method
+		setContentView(R.layout.activity_word_player);
+		
+		//assign variable to the TextView
 		wordsTxtView = (TextView) findViewById(R.id.fullscreen_content);
-		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		mFilePath = mPrefs.getString("Name",null);
 		
-		Log.d(TAG,"test");
+		//load the last file selected.
+		mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		mFilePath = mPrefs.getString("recent_book","");
 		
-		player.run();
+		Log.d(TAG,mFilePath+" file path from settings");
 		
 		
+		player();
+		//player.run();
 		
 		
 		setContentView(R.layout.activity_word_player);
@@ -221,6 +248,10 @@ public class WordPlayerActivity extends Activity {
 					}
 				});
 
+		
+	   
+		
+		
 		// Set up the user interaction to manually show or hide the system UI.
 		contentView.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -254,8 +285,23 @@ public class WordPlayerActivity extends Activity {
 		// created, to briefly hint to the user that UI controls
 		// are available.
 		delayedHide(100);
+		
 	}
 
+	 @Override
+	 public void onResume() {
+	    	
+	        super.onResume();
+	        mHandler.postDelayed(playWords,500); 
+	    }       
+
+	    @Override
+	    public void onPause() {
+	    	super.onPause();
+	        mHandler.removeCallbacks(playWords);
+	    }
+	
+	
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
 	 */

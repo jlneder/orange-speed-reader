@@ -18,12 +18,14 @@ import android.widget.Toast;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 
 
-
 public class FileChooser extends Activity {
 
-	private static final int REQUEST_CODE = 6384; // onActivityResult request
-	// code
+	private static final int REQUEST_CODE = 6384; // onActivityResult request code
 
+	public static final String PREFS_NAME = "OrangeSettings";
+	private String filePath;
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -40,7 +42,7 @@ public class FileChooser extends Activity {
 		try {
 			startActivityForResult(fileOpenIntent, REQUEST_CODE);
 			target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			finish();
+			//finish();
 			
 			
 		} catch (ActivityNotFoundException e) {
@@ -65,21 +67,19 @@ public class FileChooser extends Activity {
 						final File file = FileUtils.getFile(uri);
 						
 						//save the selected file path
-						String filePath =  file.getAbsolutePath();
+						filePath =  file.getAbsolutePath();
 						
-						Toast.makeText(FileChooser.this,
-								"File Selected: " + file.getAbsolutePath(),
-								Toast.LENGTH_LONG).show();
-						//start the word player using the picked file
-						Intent wordPlayerIntent = new Intent(getApplicationContext(), WordPlayerActivity.class);
+						Log.d("file","filePath");
+						Toast.makeText(FileChooser.this,"File Selected: "+file.getAbsolutePath(), Toast.LENGTH_LONG).show();
 						
-						//load up shared prefs for storage
-						SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 						
-						//save the prefs
-						SharedPreferences.Editor prefsEditor = mPrefs.edit();
-						prefsEditor.putString("Recent", filePath );
-						prefsEditor.commit();
+						
+						//Toast.makeText(FileChooser.this,"File Selected: " + file.getAbsolutePath(),Toast.LENGTH_LONG).show();
+						
+						//start the word player 
+						//Intent wordPlayerIntent = new Intent(getApplicationContext(), WordPlayerActivity.class);
+						
+						
 						
 						//startActivity(wordPlayerIntent);
 						
@@ -93,4 +93,20 @@ public class FileChooser extends Activity {
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
+	
+	@Override
+    protected void onStop(){
+       super.onStop();
+       	//load up shared prefs for storage
+		SharedPreferences mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		
+		//set the prefs
+		SharedPreferences.Editor editor = mPrefs.edit();
+		editor.putString("recent_book", filePath );
+		//commit the changes
+		editor.commit();
+		
+      
+    }
+
 }
