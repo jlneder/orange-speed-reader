@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
 		        	startActivity(wordPlayer);
             	}
             	else if (position == 2){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	Intent wordPlayer = new Intent(getApplicationContext(), PlayerActivity.class);
 		        	startActivity(wordPlayer);
             	}else if (position == 3){
 		        	Intent wordPlayer = new Intent(getApplicationContext(), SettingsActivity.class);

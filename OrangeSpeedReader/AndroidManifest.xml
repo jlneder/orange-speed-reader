@@ -7,7 +7,8 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -45,25 +46,25 @@
             android:name="com.duketek.orangespeedreader.FileChooser"
             android:label="@string/title_activity_file_chooser" >
         </activity>
-        
+
         <!-- intent-filter for aFileChooser Library -->
         <activity
-    android:name="com.ipaulpro.afilechooser.FileChooserActivity"
-    android:icon="@drawable/ic_chooser"
-    android:label="@string/choose_file" >
-        <intent-filter>
-            <action android:name="android.intent.action.GET_CONTENT" />
+            android:name="com.ipaulpro.afilechooser.FileChooserActivity"
+            android:icon="@drawable/ic_chooser"
+            android:label="@string/choose_file" >
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
 
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.OPENABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
 
-            <data android:mimeType="*/*" />
-        </intent-filter>
-    </activity>
-        
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.duketek.orangespeedreader.PlayerActivity"
+            android:label="@string/title_activity_player" >
+        </activity>
     </application>
-    
-    
-
 
 </manifest>

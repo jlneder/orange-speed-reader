@@ -1,6 +1,7 @@
 package com.duketek.orangespeedreader;
 
 import com.duketek.orangespeedreader.R;
+import com.duketek.orangespeedreader.PlayerActivity.UpdateTask;
 import com.duketek.orangespeedreader.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -25,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 /**
@@ -72,99 +74,27 @@ public class WordPlayerActivity extends Activity {
 	private String word = "OSR";
 	
 	private TextView wordsTxtView;
+	private String mLine;
 	
-//	private Runnable player = new Runnable(){
-//		public void run(){
-	private void player(){
-			//while words remaining
-			
-			//read in next word chunk
-			
-			//send words out to the wordplayer run
-			
-			if(mFilePath != null){
-				//load the file
-				//Scanner scan = new Scanner(filePath);
-				BufferedReader textReader = null;
-				try {
-					textReader = new BufferedReader(new FileReader(mFilePath));
-					Log.d(TAG, mFilePath+ " loaded");
-				}
-				catch (FileNotFoundException e) {
-					//popup the error
-	            	Toast.makeText(WordPlayerActivity.this,"Sorry, the file "+mFilePath+" could not be loaded",Toast.LENGTH_LONG).show();
-					e.printStackTrace();
-				}
-
-				try {
-					String line = textReader.readLine();
-
-					//TODO make this regex changeable
-					Pattern splitRegex = Pattern.compile(" ");
-					while(line != null){
-
-						//grab the words from the line split it into an array based on the pattern
-						 mWords = splitRegex.split(line);
-
-						//TODO make impulse generator
-
-						 for(int i = 0 ; i < mWords.length ; i++){
-
-							 //get the chunk from the split and load it into word to be sent to TextView
-							 word = mWords[i]; 
-							 
-							 //load the words into the text view
-							 
-							 mHandler.post(playWords);
-							 //playWords.run();
-							 
-							 //mHandler.postDelayed(this, 600000);
-							 
-							 if ( i == (mWords.length-1) ){
-								 //grab next line after the current one ran out
-								 line = textReader.readLine();
-							 }
-							 
-						 }
-						 
-					}
-					
-				} catch (IOException e) {
-	            	Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be read",Toast.LENGTH_LONG).show();
-					e.printStackTrace();
-				}
-
-
-
-			}
-
-
-			
-		}
-	//};
+	private Pattern splitRegex = Pattern.compile(" ");
+	private int mLineIndex = 0;
 	
-	//method to run in a runnable loop
-	private Runnable playWords = new Runnable()
-	{
-		public void run()
-		{
-	//private void playWords(){
-	
-			Log.d(TAG, word);
-			wordsTxtView.setText(word);
-
-			//wpm/60000 = wpm in millis
-			long wpm = 10;
-			long delay = wpm*60000;
-			try {
-				Thread.sleep(60000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			//mHandler.postDelayed(this, 60000);
+	protected AtomicBoolean isRunning=new AtomicBoolean(false);
+	protected UpdateTask updateTask = new UpdateTask();
+	protected Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			wordsTxtView.setText((String)msg.obj);
 		}
 	};
+
+
+	
+	
+	
+	
+		
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -183,13 +113,19 @@ public class WordPlayerActivity extends Activity {
 		Log.d(TAG,mFilePath+" file path from settings");
 		
 		
-		player();
+		//player.run();
 		//player.run();
 		
 		
-		setContentView(R.layout.activity_word_player);
+		//setContentView(R.layout.activity_word_player);
 		setupActionBar();
 
+		//setContentView(R.layout.activity_player);
+		//wordsTxtView = new TextView(this);
+	    //setContentView(wordsTxtView);
+	    
+		
+		
 		
 		
 		
@@ -287,20 +223,162 @@ public class WordPlayerActivity extends Activity {
 		delayedHide(100);
 		
 	}
-
-	 @Override
-	 public void onResume() {
-	    	
-	        super.onResume();
-	        mHandler.postDelayed(playWords,500); 
-	    }       
-
-	    @Override
-	    public void onPause() {
-	    	super.onPause();
-	        mHandler.removeCallbacks(playWords);
-	    }
 	
+	
+	
+	
+	
+	public void onStart() {
+	    super.onStart();
+	    isRunning.set(true);
+	    
+	    //run word filler logic
+	    updateTask.start();
+	    
+	    
+	  }
+	
+	public void onResume() {
+	    super.onResume();
+	    isRunning.set(true);
+	}
+	 
+	public void onPause() {
+	    super.onPause();
+	    isRunning.set(false);
+	    
+	        
+	}
+	
+	public void onStop() {
+	    super.onStop();
+	    isRunning.set(false);
+	  }
+	  
+	  
+	 
+	  
+	  private BufferedReader loadFile(){
+			//load the last file selected.
+			mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+			mFilePath = mPrefs.getString("recent_book","");
+			Log.d(TAG,mFilePath+" file path from settings");
+			
+			BufferedReader textReader = null;
+			
+			if(!mFilePath.equals(" ")){
+				//load the file
+				//Scanner scan = new Scanner(filePath);
+				
+				try {
+					textReader = new BufferedReader(new FileReader(mFilePath));
+					Log.d(TAG, mFilePath+ " loaded");
+				}
+				catch (FileNotFoundException e) {
+					//popup the error
+	            	Toast.makeText(WordPlayerActivity.this,"Sorry, the file "+mFilePath+" could not be loaded",Toast.LENGTH_LONG).show();
+					e.printStackTrace();
+				}
+			}
+			return textReader;
+
+		}
+	  
+	  	  
+	  protected class UpdateTask extends Thread implements Runnable {
+	    public void run() {
+	    	
+	    	while(isRunning.get()){
+
+	    		BufferedReader textReader = loadFile();
+	    		// String mLine = getNextLine(textReader);
+	    		// String word = getNextWord(line);
+
+
+	    		if(mFilePath != null){
+	    			//load the file
+	    			//Scanner scan = new Scanner(filePath);
+	    			//BufferedReader textReader = null;
+	    			try {
+	    				textReader = new BufferedReader(new FileReader(mFilePath));
+	    				Log.d(TAG, mFilePath+ " loaded");
+	    			}
+	    			catch (FileNotFoundException e) {
+	    				//popup the error
+	    				Toast.makeText(WordPlayerActivity.this,"Sorry, the file "+mFilePath+" could not be loaded",Toast.LENGTH_LONG).show();
+	    				e.printStackTrace();
+	    			}
+
+	    			try {
+	    				String line = textReader.readLine();
+
+	    				//TODO make this regex changeable
+	    				Pattern splitRegex = Pattern.compile(" ");
+	    				while(line != null){
+
+	    					//grab the words from the line split it into an array based on the pattern
+	    					mWords = splitRegex.split(line);
+
+	    					//TODO make impulse generator
+
+	    					for(int i = 0 ; i < mWords.length ; i++){
+
+	    						//get the chunk from the split and load it into word to be sent to TextView
+	    						word = mWords[i]; 
+
+	    						//load the words into the text view
+
+	    						Log.d(TAG, word);
+	    						//wordsTxtView.setText(word);
+
+	    						//wpm/60000 = wpm in millis
+	    						long wpm = 60;
+	    						long delay = 60000/wpm;
+
+	    						try {
+	    							Thread.sleep(1000);
+	    						} catch (InterruptedException e) {
+	    							// TODO Auto-generated catch block
+	    							e.printStackTrace();
+	    						} //This could be something computationally intensive.
+	    						Message message = handler.obtainMessage();
+	    						//message.obj = Double.toString(Math.random());
+	    						message.obj = word;
+	    						handler.sendMessage(message);
+	    						//updateTask.start();
+	    						//playWords.run();
+
+	    						//mHandler.postDelayed(this, 600000);
+
+	    						if ( i == (mWords.length-1) ){
+	    							//grab next line after the current one ran out
+	    							line = textReader.readLine();
+	    						}
+
+	    					}
+
+	    				}
+
+	    			} catch (IOException e) {
+	    				Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be read",Toast.LENGTH_LONG).show();
+	    				e.printStackTrace();
+	    			}
+	    		}
+
+
+	    	}
+
+
+	    }
+	  }
+
+
+	
+	
+	
+	
+
+	 	
 	
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
