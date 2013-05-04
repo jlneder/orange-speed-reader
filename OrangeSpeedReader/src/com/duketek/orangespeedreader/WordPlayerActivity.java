@@ -69,15 +69,29 @@ public class WordPlayerActivity extends Activity {
 
 	private SharedPreferences mPrefs;
 	private String mFilePath;
-	private Handler mHandler = new Handler();
+	//private Handler mHandler = new Handler();
 	private String[] mWords;
 	private String word = "OSR";
 	
 	private TextView wordsTxtView;
+	private TextView mProgress; 
+	
 	private String mLine;
 	
-	private Pattern splitRegex = Pattern.compile(" ");
+	private String mSplitPattern = " ";
+	private Pattern mSplitRegex = Pattern.compile(mSplitPattern);
 	private int mLineIndex = 0;
+	private Object mPauseLock = new Object();;
+    private boolean mPaused = false;
+    private boolean mPause = false;
+    private boolean mLocked = false;
+    private boolean mFinished = false;
+    private BufferedReader mTextReader;
+	private int mBookmark = 0;
+	private int mWordCount;
+	
+	//default split is a blank space
+	
 	
 	protected AtomicBoolean isRunning=new AtomicBoolean(false);
 	protected UpdateTask updateTask = new UpdateTask();
@@ -105,12 +119,16 @@ public class WordPlayerActivity extends Activity {
 		
 		//assign variable to the TextView
 		wordsTxtView = (TextView) findViewById(R.id.fullscreen_content);
+		mProgress = (TextView) findViewById(R.id.textViewPages);
 		
 		//load the last file selected.
 		mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		mFilePath = mPrefs.getString("recent_book","");
+		mBookmark = mPrefs.getInt(mFilePath+"bookmark",0);
 		
 		Log.d(TAG,mFilePath+" file path from settings");
+		
+		
 		
 		
 		//player.run();
@@ -118,15 +136,21 @@ public class WordPlayerActivity extends Activity {
 		
 		
 		//setContentView(R.layout.activity_word_player);
-		setupActionBar();
 
+		
+		mTextReader = loadFile();
+		setWordCount();			
+		mProgress.setText(mBookmark + "/" + mWordCount);
+		
 		//setContentView(R.layout.activity_player);
 		//wordsTxtView = new TextView(this);
 	    //setContentView(wordsTxtView);
 	    
-		
-		
-		
+//		if (mPaused == false){
+//		mTextReader = loadFile();
+//		 //run word filler logic
+//	    updateTask.start();
+//		}
 		
 		
 		
@@ -139,52 +163,64 @@ public class WordPlayerActivity extends Activity {
 		
 		
 		
-		
+
 		// Set up an instance of SystemUiHider to control the system UI for
 		// this activity.
-		mSystemUiHider = SystemUiHider.getInstance(this, contentView,
-				HIDER_FLAGS);
+
+		setupActionBar();
+		mSystemUiHider = SystemUiHider.getInstance(this, contentView,HIDER_FLAGS);
 		mSystemUiHider.setup();
+
 		mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
-					// Cached values.
-					int mControlsHeight;
-					int mShortAnimTime;
 
-					@Override
-					@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-					public void onVisibilityChange(boolean visible) {
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-							// If the ViewPropertyAnimator API is available
-							// (Honeycomb MR2 and later), use it to animate the
-							// in-layout UI controls at the bottom of the
-							// screen.
-							if (mControlsHeight == 0) {
-								mControlsHeight = controlsView.getHeight();
-							}
-							if (mShortAnimTime == 0) {
-								mShortAnimTime = getResources().getInteger(
-										android.R.integer.config_shortAnimTime);
-							}
-							controlsView
-									.animate()
-									.translationY(visible ? 0 : mControlsHeight)
-									.setDuration(mShortAnimTime);
-						} else {
-							// If the ViewPropertyAnimator APIs aren't
-							// available, simply show or hide the in-layout UI
-							// controls.
-							controlsView.setVisibility(visible ? View.VISIBLE
-									: View.GONE);
-						}
+			// Cached values.
+			int mControlsHeight;
+			int mShortAnimTime;
 
-						if (visible && AUTO_HIDE) {
-							// Schedule a hide().
-							delayedHide(AUTO_HIDE_DELAY_MILLIS);
-						}
+			@Override
+			@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+			public void onVisibilityChange(boolean visible) {
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+					// If the ViewPropertyAnimator API is available
+					// (Honeycomb MR2 and later), use it to animate the
+					// in-layout UI controls at the bottom of the
+					// screen.
+					if (mControlsHeight == 0) {
+						mControlsHeight = controlsView.getHeight();
 					}
-				});
+					if (mShortAnimTime == 0) {
+						mShortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+					}
+					controlsView
+					.animate()
+					.translationY(visible ? 0 : mControlsHeight)
+					.setDuration(mShortAnimTime);
+				} 
+				else {
+					// If the ViewPropertyAnimator APIs aren't
+					// available, simply show or hide the in-layout UI
+					// controls.
+					controlsView.setVisibility(visible ? View.VISIBLE
+							: View.GONE);
+				}
+				
+				if (!visible/* && mPaused && mLocked*/){
+					go();
+				}
+				else if(visible /*&& !mPaused && !mLocked*/ ){
+					pause();
+				}
+					
+				
+				
+//				if (visible && AUTO_HIDE) {
+//					// Schedule a hide().
+//					delayedHide(AUTO_HIDE_DELAY_MILLIS);
+//				}
+			}
+		});
 
-		
+
 	   
 		
 		
@@ -213,6 +249,9 @@ public class WordPlayerActivity extends Activity {
 //				mDelayHideTouchListener);
 	}
 
+	
+	
+	
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
@@ -230,38 +269,82 @@ public class WordPlayerActivity extends Activity {
 	
 	public void onStart() {
 	    super.onStart();
-	    isRunning.set(true);
+	    //isRunning.set(true);
 	    
 	    //run word filler logic
-	    updateTask.start();
+	    //updateTask.start();
 	    
+	    if (mPaused == false){
+			mTextReader = loadFile();
+			
+			
+			 
+			//run word filler logic
+		    updateTask.start();
+			}
+	    
+//	    synchronized (mPauseLock) {
+//            mPaused = false;
+//            mPauseLock.notifyAll();
+//        }
 	    
 	  }
 	
+	
+	
+	
 	public void onResume() {
 	    super.onResume();
-	    isRunning.set(true);
+	    synchronized (mPauseLock) {
+            mPaused = false;
+            mPauseLock.notifyAll();
+        }
 	}
-	 
+	
+	
+	
+	
 	public void onPause() {
 	    super.onPause();
-	    isRunning.set(false);
+	    
+	    synchronized (mPauseLock) {
+            mPaused = true;
+        }
+	    //isRunning.set(false);
 	    
 	        
 	}
 	
+	
+	
+	
 	public void onStop() {
 	    super.onStop();
-	    isRunning.set(false);
-	  }
-	  
+	    
+	    synchronized (mPauseLock) {
+            mPaused = true;
+        }
+	    
+	    
+	    //set the prefs
+	    SharedPreferences.Editor editor = mPrefs.edit();
+	    editor.putInt(mFilePath+"bookmark",mBookmark);
+	    //commit the changes
+	    editor.commit();
+
+	    //isRunning.set(false);
+	}
+
 	  
 	 
 	  
 	  private BufferedReader loadFile(){
 			//load the last file selected.
-			mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-			mFilePath = mPrefs.getString("recent_book","");
+			//mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+			//load file path
+			//mFilePath = mPrefs.getString("recent_book","");
+			//load bookmark
+
 			Log.d(TAG,mFilePath+" file path from settings");
 			
 			BufferedReader textReader = null;
@@ -284,36 +367,95 @@ public class WordPlayerActivity extends Activity {
 
 		}
 	  
+	  
+	  
+	  
+	  
+	  public int rewindMark(int bookmark, int rewindAmount){
+		  
+		  bookmark = bookmark - rewindAmount;
+		  return bookmark;
+	  }
+	  
+	  
+	  
+	  
+	  
+	  
+	  public void setWordCount(){
+		  				
+		  BufferedReader wcReader = loadFile();
+
+		  Pattern splitRegex = Pattern.compile(mSplitPattern);
+		  int wordCount = 0;
+		  String line ="";
+		  String[] words;
+		  try {
+			do {
+				 
+				  line = wcReader.readLine();
+				 Log.d(TAG,line);
+				  words = splitRegex.split(line);
+				  wordCount =  wordCount + words.length;
+			  } while( wcReader.readLine() != null) ;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		  
+		  mWordCount = wordCount;
+	  }
+	  
 	  	  
+	  
+	  
+	  
+	  
 	  protected class UpdateTask extends Thread implements Runnable {
 	    public void run() {
 	    	
-	    	while(isRunning.get()){
-
-	    		BufferedReader textReader = loadFile();
+	    	
+	    		//BufferedReader textReader = loadFile();
 	    		// String mLine = getNextLine(textReader);
 	    		// String word = getNextWord(line);
 
 
-	    		if(mFilePath != null){
+//	    		if(mFilePath != null){
 	    			//load the file
 	    			//Scanner scan = new Scanner(filePath);
 	    			//BufferedReader textReader = null;
-	    			try {
-	    				textReader = new BufferedReader(new FileReader(mFilePath));
-	    				Log.d(TAG, mFilePath+ " loaded");
-	    			}
-	    			catch (FileNotFoundException e) {
-	    				//popup the error
-	    				Toast.makeText(WordPlayerActivity.this,"Sorry, the file "+mFilePath+" could not be loaded",Toast.LENGTH_LONG).show();
-	    				e.printStackTrace();
-	    			}
+//	    			try {
+//	    				textReader = new BufferedReader(new FileReader(mFilePath));
+//	    				Log.d(TAG, mFilePath+ " loaded");
+//	    			}
+//	    			catch (FileNotFoundException e) {
+//	    				//popup the error
+//	    				Toast.makeText(WordPlayerActivity.this,"Sorry, the file "+mFilePath+" could not be loaded",Toast.LENGTH_LONG).show();
+//	    				e.printStackTrace();
+//	    			}
 
 	    			try {
-	    				String line = textReader.readLine();
+	    				
+	    				//if not starting the book at the beginning
+	    				//load up to the location
+	    				if (mBookmark >0){
+	    					String line = mTextReader.readLine();
+	    					Pattern splitRegex = Pattern.compile(mSplitPattern);
+	    					mWords = splitRegex.split(line);
+	    					int b = 0;
+	    					while (b+mWords.length < mBookmark){
+	    						b = b+mWords.length;
+	    						line = mTextReader.readLine();
+	    					}
+	    				}
+	    					
+	    					
+	    				
+	    				
+	    				String line = mTextReader.readLine();
 
 	    				//TODO make this regex changeable
-	    				Pattern splitRegex = Pattern.compile(" ");
+	    				Pattern splitRegex = Pattern.compile(mSplitPattern);
 	    				while(line != null){
 
 	    					//grab the words from the line split it into an array based on the pattern
@@ -323,26 +465,44 @@ public class WordPlayerActivity extends Activity {
 
 	    					for(int i = 0 ; i < mWords.length ; i++){
 
+	    						//hook to pause the thread if needed
+	    						synchronized (mPauseLock) {
+	    			                while (mPaused) {
+	    			                    try {
+	    			                    	
+	    			                        mPauseLock.wait();
+	    			                        
+	    			                    } catch (InterruptedException e) {
+	    			                    }
+	    			                }
+	    			            }
+	    						
 	    						//get the chunk from the split and load it into word to be sent to TextView
 	    						word = mWords[i]; 
 
+	    						//store the current location
+	    						mBookmark++;
+	    						
 	    						//load the words into the text view
 
 	    						Log.d(TAG, word);
 	    						//wordsTxtView.setText(word);
 
 	    						//wpm/60000 = wpm in millis
-	    						long wpm = 60;
-	    						long delay = 60000/wpm;
+	    						int wpm = 600;
+	    						int delay = 60000/wpm;
 
 	    						try {
-	    							Thread.sleep(1000);
+	    							Thread.sleep(delay);
 	    						} catch (InterruptedException e) {
 	    							// TODO Auto-generated catch block
 	    							e.printStackTrace();
-	    						} //This could be something computationally intensive.
+	    						} 
+	    						
+	    						
+	    						
+	    						
 	    						Message message = handler.obtainMessage();
-	    						//message.obj = Double.toString(Math.random());
 	    						message.obj = word;
 	    						handler.sendMessage(message);
 	    						//updateTask.start();
@@ -352,7 +512,7 @@ public class WordPlayerActivity extends Activity {
 
 	    						if ( i == (mWords.length-1) ){
 	    							//grab next line after the current one ran out
-	    							line = textReader.readLine();
+	    							line = mTextReader.readLine();
 	    						}
 
 	    					}
@@ -363,14 +523,28 @@ public class WordPlayerActivity extends Activity {
 	    				Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be read",Toast.LENGTH_LONG).show();
 	    				e.printStackTrace();
 	    			}
+	    			
+	    			
 	    		}
 
 
 	    	}
 
 
-	    }
-	  }
+	  public synchronized void pause() {
+		    mPaused = true;
+		}
+
+		public void go() {
+		    synchronized(mPauseLock){
+		    	mPaused = false;
+		    	mPauseLock.notifyAll();
+		    	
+		    }
+			
+			 
+		}
+	  
 
 
 	
@@ -418,10 +592,50 @@ public class WordPlayerActivity extends Activity {
 	View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
 		@Override
 		public boolean onTouch(View view, MotionEvent motionEvent) {
-			if (AUTO_HIDE) {
-				delayedHide(AUTO_HIDE_DELAY_MILLIS);
-			}
-			return false;
+			
+			
+			 int eventaction = motionEvent.getAction();
+
+			 
+			 switch (eventaction) {
+
+			 // finger touches the screen
+			 case MotionEvent.ACTION_DOWN: 
+
+				 break;
+
+				 // finger moves on the screen
+			 case MotionEvent.ACTION_MOVE:
+
+				 break;
+
+				 // finger leaves the screen
+			 case MotionEvent.ACTION_UP:   
+				 
+	            	Toast.makeText(WordPlayerActivity.this,"Finger up",Toast.LENGTH_LONG).show();
+
+				 
+				 if (isRunning.get() == false){ 
+					 pause();
+				 }
+				 else{
+					 go();
+				 }
+				 mPaused = true;
+				 break;
+			 }
+
+			 // tell the system that we handled the event and no further processing is required
+			 return true; 
+			
+			
+			
+			
+			
+//			if (AUTO_HIDE) {
+//				delayedHide(AUTO_HIDE_DELAY_MILLIS);
+//			}
+//			return false;
 		}
 	};
 

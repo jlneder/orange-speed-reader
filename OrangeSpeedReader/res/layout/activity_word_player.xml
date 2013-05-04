@@ -63,9 +63,12 @@
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <SeekBar
-                    android:id="@+id/seekBar1"
+                    android:id="@+id/wpsBar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:max="1500"
+                    android:progress="300" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -83,7 +86,7 @@
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <SeekBar
-                    android:id="@+id/seekBar2"
+                    android:id="@+id/progressBar"
                     android:layout_width="match_parent"
                     android:layout_height="0dip"
                     android:layout_weight="1" />

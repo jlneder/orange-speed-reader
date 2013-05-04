@@ -84,8 +84,7 @@ public class FileChooser extends Activity {
 						//startActivity(wordPlayerIntent);
 						
 					} catch (Exception e) {
-						Log.e("FileSelectorTestActivity", "File select error",
-								e);
+						Log.e("FileSelectorTestActivity", "File select error",	e);
 					}
 				}
 			}
