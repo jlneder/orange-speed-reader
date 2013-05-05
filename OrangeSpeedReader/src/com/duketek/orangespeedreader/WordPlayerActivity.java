@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.app.NavUtils;
@@ -75,6 +77,7 @@ public class WordPlayerActivity extends Activity {
 	
 	private TextView wordsTxtView;
 	private TextView mProgress; 
+	private SeekBar mProgressBar;
 	
 	private String mLine;
 	
@@ -99,6 +102,9 @@ public class WordPlayerActivity extends Activity {
 		@Override
 		public void handleMessage(Message msg) {
 			wordsTxtView.setText((String)msg.obj);
+			mProgress.setText(mBookmark + "/" + mWordCount);
+			mProgressBar.setProgress(mBookmark);
+			
 		}
 	};
 
@@ -139,8 +145,35 @@ public class WordPlayerActivity extends Activity {
 
 		
 		mTextReader = loadFile();
+		
+		//setup progress bar and text
 		setWordCount();			
 		mProgress.setText(mBookmark + "/" + mWordCount);
+		mProgressBar = (SeekBar) findViewById(R.id.progressBar);
+		mProgressBar.setMax(mWordCount);
+		mProgressBar.setProgress(mBookmark);
+		
+		mProgressBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				// Log the progress
+				Log.d("DEBUG", "Progress is: "+progress);
+				//set textView's text
+				mProgress.setText( progress + "/" + mProgressBar.getMax() );
+			}
+
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+
+			public void onStopTrackingTouch(SeekBar seekBar) {}
+
+		}
+		
+				
+				
+				);
+		
+		
+		
+		
 		
 		//setContentView(R.layout.activity_player);
 		//wordsTxtView = new TextView(this);
@@ -221,6 +254,9 @@ public class WordPlayerActivity extends Activity {
 		});
 
 
+
+		
+		
 	   
 		
 		
