@@ -18,7 +18,6 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:keepScreenOn="true"
-        android:text="Words"
         android:textColor="#33b5e5"
         android:textSize="50sp"
         android:textStyle="bold" />
@@ -63,7 +62,7 @@
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <SeekBar
-                    android:id="@+id/wpsBar"
+                    android:id="@+id/wpmBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:max="1500"

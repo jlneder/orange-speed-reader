@@ -76,8 +76,12 @@ public class WordPlayerActivity extends Activity {
 	private String word = "OSR";
 	
 	private TextView wordsTxtView;
-	private TextView mProgress; 
+	private TextView mProgressText; 
 	private SeekBar mProgressBar;
+	private SeekBar mSpeedBar;
+	private TextView mSpeedText;
+	private AtomicBoolean mNewLocation = new AtomicBoolean(false);
+	private int mProgress;
 	
 	private String mLine;
 	
@@ -92,18 +96,31 @@ public class WordPlayerActivity extends Activity {
     private BufferedReader mTextReader;
 	private int mBookmark = 0;
 	private int mWordCount;
-	
+	private int mWPM = 250;
 	//default split is a blank space
-	
-	
+	protected double pcnt;
+	protected double ETA; 
 	protected AtomicBoolean isRunning=new AtomicBoolean(false);
+	protected AtomicBoolean stopFlag=new AtomicBoolean(false);
 	protected UpdateTask updateTask = new UpdateTask();
+	
+	
+	
+	
 	protected Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			wordsTxtView.setText((String)msg.obj);
-			mProgress.setText(mBookmark + "/" + mWordCount);
-			mProgressBar.setProgress(mBookmark);
+			
+			pcnt = ( (double)mProgress / (double)mWordCount) * 100.0d;
+			ETA = ( (double)mWordCount - (double)mProgress ) / (double)mWPM;
+			mProgressText.setText( 	mProgress + "/" + mWordCount +
+									" " + String.format("%.2f",pcnt) + "%" +
+									" ETA: "+String.format("%.2f",ETA) + "min"  
+									);
+			//mProgressText.setText(mBookmark + "/" + mWordCount);
+			mProgressBar.setProgress(mProgress);
+			//Log.d(TAG,"mprogress out"+mProgress);
 			
 		}
 	};
@@ -125,12 +142,13 @@ public class WordPlayerActivity extends Activity {
 		
 		//assign variable to the TextView
 		wordsTxtView = (TextView) findViewById(R.id.fullscreen_content);
-		mProgress = (TextView) findViewById(R.id.textViewPages);
+		
 		
 		//load the last file selected.
 		mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		mFilePath = mPrefs.getString("recent_book","");
 		mBookmark = mPrefs.getInt(mFilePath+"bookmark",0);
+		mWPM = mPrefs.getInt(mFilePath+"WPM",250);
 		
 		Log.d(TAG,mFilePath+" file path from settings");
 		
@@ -144,34 +162,97 @@ public class WordPlayerActivity extends Activity {
 		//setContentView(R.layout.activity_word_player);
 
 		
-		mTextReader = loadFile();
+		//mTextReader = loadFile();
 		
-		//setup progress bar and text
+		if (mBookmark >0){
+			mProgress = mBookmark;
+			// mTextReader =  loadLocation(mBookmark);
+			// Log.d(TAG,"mBookmark starting #: "+mBookmark);
+			 mNewLocation.set(true);
+		 }
+		
+		
 		setWordCount();			
-		mProgress.setText(mBookmark + "/" + mWordCount);
-		mProgressBar = (SeekBar) findViewById(R.id.progressBar);
-		mProgressBar.setMax(mWordCount);
-		mProgressBar.setProgress(mBookmark);
 		
-		mProgressBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+		 
+		
+		 //setup progress bar and text
+		 mProgressText = (TextView) findViewById(R.id.textViewPages);
+		 mProgressText.setText(mBookmark + "/" + mWordCount);
+		 mProgressBar = (SeekBar) findViewById(R.id.progressBar);
+		 mProgressBar.setMax(mWordCount);
+		 mProgressBar.setProgress(mBookmark);
+		 
+
+		 mProgressBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+			 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				 // Log the progress
+				 Log.d("DEBUG", "Progress is: "+progress);
+				 //set textView's text
+				 double pcnt = ((double)progress / (double)mProgressBar.getMax()*100.0d);
+								
+				//mProgressText.setText( progress + "/" + mProgressBar.getMax() +" "+  String.format("%.2f",pcnt) + "%" );
+				 ETA = ( (double)mWordCount - (double)mProgress ) / (double)mWPM;
+				 mProgressText.setText( 	progress + "/" + mWordCount +
+						" " + String.format("%.2f",pcnt) + "%" +
+						" ETA: "+String.format("%.2f",ETA) + "min"  
+						);
+				//only run on updates (needed?)
+				mProgress = progress;
+				
+				
+			}
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+			
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			
+				//restart thread after lifting finger off the bar
+				//so as it wont freak out
+			
+				//mProgress = mProgressBar.getProgress();
+				//stop the thread
+				//stop(); 
+				
+				//stopFlag.set(true); 				
+				mNewLocation.set(true);
+				
+				//start();
+
+				//updateTask = new UpdateTask();
+				//updateTask.start();
+			}
+		}	);
+		
+		
+		
+		
+		//setup wpm speed bar (top)
+		mSpeedText = (TextView) findViewById(R.id.textViewWPM);
+		mSpeedBar = (SeekBar) findViewById(R.id.wpmBar);
+		
+		mSpeedText.setText( mWPM+ " WPM");
+		mSpeedBar.setProgress(mWPM);
+		mSpeedBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				// Log the progress
-				Log.d("DEBUG", "Progress is: "+progress);
+				Log.d("DEBUG", "WPM is: "+progress);
 				//set textView's text
-				mProgress.setText( progress + "/" + mProgressBar.getMax() );
+				mSpeedText.setText(progress + " WPM");
+				mWPM = progress;
+				ETA = ( (double)mWordCount - (double)mProgress ) / (double)mWPM;
+				mProgressText.setText( 	mProgress + "/" + mWordCount +
+						" " + String.format("%.2f",pcnt) + "%" +
+						" ETA: "+String.format("%.2f",ETA) + "min"  
+						);
 			}
 
 			public void onStartTrackingTouch(SeekBar seekBar) {}
 
 			public void onStopTrackingTouch(SeekBar seekBar) {}
 
-		}
+		}	);
 		
-				
-				
-				);
-		
-		
+
 		
 		
 		
@@ -311,7 +392,13 @@ public class WordPlayerActivity extends Activity {
 	    //updateTask.start();
 	    
 	    if (mPaused == false){
-			mTextReader = loadFile();
+	    	if (mBookmark >0){
+				//mProgress = mBookmark;
+				 mTextReader =  loadLocation(mBookmark);
+				 Log.d(TAG,"mBookmark starting #: "+mBookmark);
+				 mNewLocation.set(true);
+			 }
+			//mTextReader = loadFile();
 			
 			
 			 
@@ -364,7 +451,8 @@ public class WordPlayerActivity extends Activity {
 	    
 	    //set the prefs
 	    SharedPreferences.Editor editor = mPrefs.edit();
-	    editor.putInt(mFilePath+"bookmark",mBookmark);
+	    editor.putInt(mFilePath+"bookmark",mProgress);
+	    editor.putInt(mFilePath+"WPM",mWPM);
 	    //commit the changes
 	    editor.commit();
 
@@ -390,6 +478,7 @@ public class WordPlayerActivity extends Activity {
 				//Scanner scan = new Scanner(filePath);
 				
 				try {
+					
 					textReader = new BufferedReader(new FileReader(mFilePath));
 					Log.d(TAG, mFilePath+ " loaded");
 				}
@@ -430,7 +519,7 @@ public class WordPlayerActivity extends Activity {
 			do {
 				 
 				  line = wcReader.readLine();
-				 Log.d(TAG,line);
+				 //Log.d(TAG,line);
 				  words = splitRegex.split(line);
 				  wordCount =  wordCount + words.length;
 			  } while( wcReader.readLine() != null) ;
@@ -441,132 +530,233 @@ public class WordPlayerActivity extends Activity {
 		  
 		  mWordCount = wordCount;
 	  }
+
 	  
-	  	  
 	  
+	  
+	  
+
+	  private BufferedReader loadLocation(int mark){
+
+		  BufferedReader seekReader = loadFile();
+
+		  
+		  String line ="";
+		  
+		  		  
+		  try {
+			  line = seekReader.readLine();
+		  } catch (IOException e1) {
+			  // TODO Auto-generated catch block
+			  e1.printStackTrace();
+		  }
+		  
+		  Pattern splitRegex = Pattern.compile(mSplitPattern);
+		  mWords = splitRegex.split(line);
+		  int b = 0;
+		  
+		  while (b + mWords.length < mark){
+			  b = b+mWords.length;
+			
+			  try {
+				  line = seekReader.readLine();
+			  } catch (IOException e) {
+				  // TODO Auto-generated catch block
+				  e.printStackTrace();
+			  }
+			  
+		  }
+		  //last few
+		  
+		  mWords = splitRegex.split(line);
+		  for (int i = b; i < mark; i++){
+			  b = b++;
+		  }
+		  //Log.d(TAG,"returned: " +b+"");
+		  
+		  //replace existing buffer with the new one
+		  //mTextReader = seekReader;
+		  mNewLocation.set(false);
+		  return seekReader;
+		  //return mWords;
+
+	  }
+
+
 	  
 	  
 	  
 	  protected class UpdateTask extends Thread implements Runnable {
-	    public void run() {
-	    	
-	    	
-	    		//BufferedReader textReader = loadFile();
-	    		// String mLine = getNextLine(textReader);
-	    		// String word = getNextWord(line);
+		  public void run() {
+			  int delay = 0;
+
+			  //BufferedReader textReader = loadFile();
+			  // String mLine = getNextLine(textReader);
+			  // String word = getNextWord(line);
 
 
-//	    		if(mFilePath != null){
-	    			//load the file
-	    			//Scanner scan = new Scanner(filePath);
-	    			//BufferedReader textReader = null;
-//	    			try {
-//	    				textReader = new BufferedReader(new FileReader(mFilePath));
-//	    				Log.d(TAG, mFilePath+ " loaded");
-//	    			}
-//	    			catch (FileNotFoundException e) {
-//	    				//popup the error
-//	    				Toast.makeText(WordPlayerActivity.this,"Sorry, the file "+mFilePath+" could not be loaded",Toast.LENGTH_LONG).show();
-//	    				e.printStackTrace();
-//	    			}
+			  //	    		if(mFilePath != null){
+			  //load the file
+			  //Scanner scan = new Scanner(filePath);
+			  //BufferedReader textReader = null;
+			  //	    			try {
+			  //	    				textReader = new BufferedReader(new FileReader(mFilePath));
+			  //	    				Log.d(TAG, mFilePath+ " loaded");
+			  //	    			}
+			  //	    			catch (FileNotFoundException e) {
+			  //	    				//popup the error
+			  //	    				Toast.makeText(WordPlayerActivity.this,"Sorry, the file "+mFilePath+" could not be loaded",Toast.LENGTH_LONG).show();
+			  //	    				e.printStackTrace();
+			  //	    			}
 
-	    			try {
-	    				
-	    				//if not starting the book at the beginning
-	    				//load up to the location
-	    				if (mBookmark >0){
-	    					String line = mTextReader.readLine();
-	    					Pattern splitRegex = Pattern.compile(mSplitPattern);
-	    					mWords = splitRegex.split(line);
-	    					int b = 0;
-	    					while (b+mWords.length < mBookmark){
-	    						b = b+mWords.length;
-	    						line = mTextReader.readLine();
-	    					}
-	    				}
-	    					
-	    					
-	    				
-	    				
-	    				String line = mTextReader.readLine();
+			  try {
 
-	    				//TODO make this regex changeable
-	    				Pattern splitRegex = Pattern.compile(mSplitPattern);
-	    				while(line != null){
+				  //if not starting the book at the beginning
+				  //load up to the location
+//				  if (mBookmark >0){
+//
+//					 mTextReader =  loadLocation(mProgress);
+//
+//				  }
+//				  else if(mNewLocation.get()){
+//					  loadLocation(mProgress);
+//					  mNewLocation.set(false);
 
-	    					//grab the words from the line split it into an array based on the pattern
-	    					mWords = splitRegex.split(line);
+					  //	    					String line = mTextReader.readLine();
+					  //	    					Pattern splitRegex = Pattern.compile(mSplitPattern);
+					  //	    					mWords = splitRegex.split(line);
+					  //	    					int b = 0;
+					  //	    					while (b + mWords.length < mBookmark){
+					  //	    						b = b+mWords.length;
+					  //	    						line = mTextReader.readLine();
+					  //	    					}
+					  //	    					//last few
+					  //	    					mWords = splitRegex.split(line);
+					  //	    					for (int i = b; i < mBookmark; i++){
+					  //	    						b = b++;
+					  //	    					}
 
-	    					//TODO make impulse generator
-
-	    					for(int i = 0 ; i < mWords.length ; i++){
-
-	    						//hook to pause the thread if needed
-	    						synchronized (mPauseLock) {
-	    			                while (mPaused) {
-	    			                    try {
-	    			                    	
-	    			                        mPauseLock.wait();
-	    			                        
-	    			                    } catch (InterruptedException e) {
-	    			                    }
-	    			                }
-	    			            }
-	    						
-	    						//get the chunk from the split and load it into word to be sent to TextView
-	    						word = mWords[i]; 
-
-	    						//store the current location
-	    						mBookmark++;
-	    						
-	    						//load the words into the text view
-
-	    						Log.d(TAG, word);
-	    						//wordsTxtView.setText(word);
-
-	    						//wpm/60000 = wpm in millis
-	    						int wpm = 600;
-	    						int delay = 60000/wpm;
-
-	    						try {
-	    							Thread.sleep(delay);
-	    						} catch (InterruptedException e) {
-	    							// TODO Auto-generated catch block
-	    							e.printStackTrace();
-	    						} 
-	    						
-	    						
-	    						
-	    						
-	    						Message message = handler.obtainMessage();
-	    						message.obj = word;
-	    						handler.sendMessage(message);
-	    						//updateTask.start();
-	    						//playWords.run();
-
-	    						//mHandler.postDelayed(this, 600000);
-
-	    						if ( i == (mWords.length-1) ){
-	    							//grab next line after the current one ran out
-	    							line = mTextReader.readLine();
-	    						}
-
-	    					}
-
-	    				}
-
-	    			} catch (IOException e) {
-	    				Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be read",Toast.LENGTH_LONG).show();
-	    				e.printStackTrace();
-	    			}
-	    			
-	    			
-	    		}
+				//  }
 
 
-	    	}
 
 
+				  String line = mTextReader.readLine();
+
+				  //TODO make this regex changeable
+				  Pattern splitRegex = Pattern.compile(mSplitPattern);
+
+				  while(line != null){
+					  if(!mNewLocation.get()){
+						  //grab the words from the line split it into an array based on the pattern
+						  if (mWords.length != 0 ){
+
+							  mWords = splitRegex.split(line);
+						  }
+
+						  //TODO make impulse generator
+
+						  for(int i = 0 ; i < mWords.length ; i++){
+							  if(!mNewLocation.get()){
+								  //hook to pause the thread if needed
+								  synchronized (mPauseLock) {
+									  while (mPaused) {
+										  try {
+
+											  mPauseLock.wait();
+
+										  } catch (InterruptedException e) {
+										  }
+									  }
+								  }
+
+								  //get the chunk from the split and load it into word to be sent to TextView
+								  word = mWords[i]; 
+
+								  //store the current location
+								  mProgress++;
+
+								  //load the words into the text view
+
+								  //Log.d(TAG, word);
+								  //wordsTxtView.setText(word);
+
+								  //wpm/60000 = wpm in millis
+								  //int wpm = mWPM;
+								  delay = 60000/mWPM;
+
+								  try {
+									  Thread.sleep(delay);
+								  } catch (InterruptedException e) {
+									  // TODO Auto-generated catch block
+									  e.printStackTrace();
+								  } 
+
+
+
+
+								  Message message = handler.obtainMessage();
+								  message.obj = word;
+								  handler.sendMessage(message);
+								  //updateTask.start();
+								  //playWords.run();
+
+								  //mHandler.postDelayed(this, 600000);
+
+								  if ( i == (mWords.length-1) ){
+									  //grab next line after the current one ran out
+									  line = mTextReader.readLine();
+								  }
+							  }
+//							  else{
+//								  mTextReader =  loadLocation(mProgress);
+//								  Log.d(TAG, "Loaded line, inner loop"+mProgress);
+//								  line = mTextReader.readLine();
+//								  
+//							  }
+						  }
+					  }
+					  else{
+						  mTextReader =  loadLocation(mProgress);
+						  line = mTextReader.readLine();
+						  Log.d(TAG, "Loaded line, outer loop"+mProgress);
+						 
+					  }
+						  
+
+				  }
+		  						  
+
+
+			  } catch (IOException e) {
+				  Toast.makeText(WordPlayerActivity.this,"Sorry, the file could not be read",Toast.LENGTH_LONG).show();
+				  e.printStackTrace();
+			  }
+
+
+		  }
+
+
+	  }
+
+	  /*
+	   * Stops the tread by setting an atomicBoolean stopFlag
+	   * that gets checked inside every loop in the thread
+	   */
+	  public synchronized void stop() {
+	        stopFlag.set(true);
+	        
+	        
+	        /*try {
+				updateTask.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
+	        
+	    }
+	  
+	  
 	  public synchronized void pause() {
 		    mPaused = true;
 		}
