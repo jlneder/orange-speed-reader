@@ -24,13 +24,20 @@ public class FileChooser extends Activity {
 
 	public static final String PREFS_NAME = "OrangeSettings";
 	private String filePath;
+	private SharedPreferences mPrefs;
+	private int mRecentBookSlot;
 	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		mRecentBookSlot = mPrefs.getInt("recentBookSlot",0);
+		
+		
 		showChooser();
+		
 	}
 
 	private void showChooser() {
@@ -94,17 +101,27 @@ public class FileChooser extends Activity {
 	}
 	
 	@Override
-    protected void onStop(){
-       super.onStop();
+	protected void onStop(){
+		super.onStop();
        	//load up shared prefs for storage
-		SharedPreferences mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-		
-		//set the prefs
+		//SharedPreferences mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		SharedPreferences.Editor editor = mPrefs.edit();
+       
+		boolean wasAdded = mPrefs.getBoolean(filePath+"added",false);
+		//set the prefs
+		if (!wasAdded){
+			//store if it was saved, the slot and setup the next slot
+			editor.putBoolean(filePath+"added", true);
+			editor.putString("slot"+mRecentBookSlot, filePath);
+			editor.putInt("recent_book_slot", (mRecentBookSlot + 1) );
+			
+		}
+
 		editor.putString("recent_book", filePath );
+
 		//commit the changes
 		editor.commit();
-		
+
       
     }
 

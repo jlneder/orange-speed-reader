@@ -39,20 +39,9 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:orientation="vertical" >
-
-                <TextView
-                    android:id="@+id/textViewPercentageBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/percentage_bar"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <ProgressBar
-                    android:id="@+id/progressBar1"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                android:minHeight="45dip"
+                android:orientation="vertical"
+                android:paddingTop="20dp" >
 
                 <TextView
                     android:id="@+id/textViewWPM"
@@ -75,12 +64,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:paddingBottom="10dp"
+                android:paddingLeft="1dp"
+                android:paddingRight="1dp"
+                android:paddingTop="10dp" >
 
                 <TextView
                     android:id="@+id/textViewPages"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="25dip"
                     android:text="@string/pages"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 

@@ -39,14 +39,14 @@ public class MainActivity extends Activity {
 		        	startActivity(wordPlayer);
             	}
             	else if (position == 2){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), PlayerActivity.class);
+		        	Intent wordPlayer = new Intent(getApplicationContext(), RecentBooksActivity.class);
 		        	startActivity(wordPlayer);
             	}else if (position == 3){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), SettingsActivity.class);
+		        	Intent wordPlayer = new Intent(getApplicationContext(), AboutActivity.class);
 		        	startActivity(wordPlayer);
             	}
             	else if (position == 4){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+		        	Intent wordPlayer = new Intent(getApplicationContext(), SettingsActivity.class);
 		        	startActivity(wordPlayer);
             	}
             	else if (position == 5){ //exit

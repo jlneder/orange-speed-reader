@@ -14,5 +14,7 @@
     <string name="title_activity_btn_box">BtnBox</string>
     <string name="title_activity_file_chooser">FileChooser</string>
     <string name="title_activity_player">PlayerActivity</string>
+    <string name="title_activity_recent_books">RecentBooksActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
 
 </resources>

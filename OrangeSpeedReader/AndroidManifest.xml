@@ -65,6 +65,14 @@
             android:name="com.duketek.orangespeedreader.PlayerActivity"
             android:label="@string/title_activity_player" >
         </activity>
+        <activity
+            android:name="com.duketek.orangespeedreader.RecentBooksActivity"
+            android:label="@string/title_activity_recent_books" >
+        </activity>
+        <activity
+            android:name="com.duketek.orangespeedreader.AboutActivity"
+            android:label="@string/title_activity_about" >
+        </activity>
     </application>
 
 </manifest>
