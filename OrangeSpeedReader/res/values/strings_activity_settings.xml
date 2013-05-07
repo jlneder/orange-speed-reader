@@ -6,25 +6,96 @@
     <!-- Strings related to Settings -->
 
 
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact based on your message history</string>
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <!-- Font settings -->
+    <string name="pref_header_font">Font</string>
+    
+    
+    <string name="pref_title_day_mode">Day Mode</string>
+    <string name="pref_description_day_mode">Disable for night mode</string>
+    
+    
+    <string name="pref_title_day_font_color">Daytime Font Color</string>
+    <string name="pref_description_day_font_color">Color of the font for the Word Player in day mode</string>
+    
+    <string name="pref_title_day_background_color">Daytime Background Color</string>
+    <string name="pref_description_day_background_color">Color of the background for the word player in day mode</string>
+    
+    <string name="pref_title_day_background_color">Daytime Slider Color</string>
+    <string name="pref_description_day_background_color">Color of the slider and overlay text in day mode</string>
 
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
+    <string name="pref_title_night_font_color">Night Time Font Color</string>
+    <string name="pref_description_night_font_color">Color of the font for the word player in night mode</string>
+    
+    <string name="pref_title_night_background_color">Night Time Background Color</string>
+    <string name="pref_description_night_background_color">Color of the background for the Word Player in night mode</string>
+    
+	<string name="pref_title_day_background_color">Night Time Slider Color</string>
+    <string name="pref_description_day_background_color">Color of the slider and overlay text in night mode</string>
+    
+    
+    
+    <string name="pref_title_font">Font</string>
+    <string name="pref_description_font">The Font for the Word Player</string>
+    <string-array name="pref_font_list_font">
+        <item>Droid Sans</item>
+        <item>Droid Serif</item>
+        <item>Droid Sans Mono</item>
     </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
+    <string-array name="pref_font_list_values">
+        <item>SANS_SERIF</item>
+        <item>SERIF</item>
+        <item>MONOSPACE</item>
+    </string-array>    
+    
+    <string name="pref_title_font_style">Font Style</string>
+    <string name="pref_description_font_style">Italics, Bold, Bold and Italic</string>
+    <string-array name="pref_font_style_list_font">
+        <item>Normal</item>
+        <item>Bold</item>
+        <item>Italic</item>
+        <item>Bold and Italic</item>
     </string-array>
-
+    <string-array name="pref_font_style_list_values">
+        <item>NORMAL</item>
+        <item>BOLD</item>
+        <item>ITALIC</item>
+        <item>BOLD_ITALIC</item>
+	</string-array>    
+    
+    
+    
+    
+    
+    <string name="pref_title_font_size">Font Size</string>
+    <!--  <string name="pref_description_font_size"></string>-->
+    
+    <string name="pref_title_text_alignment">Text Alignment</string>
+    <string name="pref_description_text_alignment">Where the words are on the screen</string>
+    
+    <!-- Playback settings -->
+    <string name="pref_header_playback">Playback</string>
+    
+    <string name="pref_title_words">Words at a time</string>
+    <string name="pref_description_words">The number of words flashed on the screen at a time.</string>
+    
+    <string name="pref_title_default_wpm">Default Words Per Minute</string>
+    <string name="pref_description_default_wpm">The speed of the word player when opening a new book</string>
+    
+    <string name="pref_title_variable_speed">Variable Speed Words</string>
+    <string name="pref_description_variable_speed">The number of words flashed on the screen at a time.</string>
+    
+    <string name="pref_title_slow_down">Variable Speed Words</string>
+    <string name="pref_description_slow_down">The number of words flashed on the screen at a time.</string>
+    
+    <string name="pref_title_new_chunk_at_end">Variable Speed Words</string>
+    <string name="pref_description_new_chunk_at_end">The number of words flashed on the screen at a time.</string>
+    
+    <string name="pref_title_skip_articles">Variable Speed Words</string>
+    <string name="pref_description_skip_articles">The number of words flashed on the screen at a time.</string>
+    
+    
+    
+    
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
     <string name="pref_title_sync_frequency">Sync frequency</string>
