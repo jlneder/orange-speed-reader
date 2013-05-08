@@ -4,13 +4,10 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.example.orangespeedreader.SettingsActivity$GeneralPreferenceFragment"
-        android:title="@string/pref_header_general" />
+        android:fragment="com.example.orangespeedreader.SettingsActivity$FontPreferenceFragment"
+        android:title="@string/pref_header_font" />
     <header
-        android:fragment="com.example.orangespeedreader.SettingsActivity$NotificationPreferenceFragment"
-        android:title="@string/pref_header_notifications" />
-    <header
-        android:fragment="com.example.orangespeedreader.SettingsActivity$DataSyncPreferenceFragment"
-        android:title="@string/pref_header_data_sync" />
-
+        android:fragment="com.example.orangespeedreader.SettingsActivity$PlayerPreferenceFragment"
+        android:title="@string/pref_header_player" />
+   
 </preference-headers>

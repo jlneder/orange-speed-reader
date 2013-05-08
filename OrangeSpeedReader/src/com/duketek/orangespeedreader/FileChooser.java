@@ -4,16 +4,11 @@ import java.io.File;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.Toast;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 
@@ -33,7 +28,7 @@ public class FileChooser extends Activity {
 		super.onCreate(savedInstanceState);
 
 		mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-		mRecentBookSlot = mPrefs.getInt("recentBookSlot",0);
+		mRecentBookSlot = mPrefs.getInt("recent_book_slot",0);
 		
 		
 		showChooser();
@@ -45,6 +40,7 @@ public class FileChooser extends Activity {
 		Intent target = FileUtils.createGetContentIntent();
 		// Create the chooser Intent
 		Intent fileOpenIntent = Intent.createChooser(target, getString(R.string.title_activity_file_chooser));
+		//Intent fileOpenIntent = new Intent(getApplicationContext(), FileChooser.class);
 		
 		try {
 			startActivityForResult(fileOpenIntent, REQUEST_CODE);
@@ -76,7 +72,7 @@ public class FileChooser extends Activity {
 						//save the selected file path
 						filePath =  file.getAbsolutePath();
 						
-						Log.d("file","filePath");
+						Log.d("file",filePath);
 						Toast.makeText(FileChooser.this,"File Selected: "+file.getAbsolutePath(), Toast.LENGTH_LONG).show();
 						
 						
@@ -109,11 +105,22 @@ public class FileChooser extends Activity {
        
 		boolean wasAdded = mPrefs.getBoolean(filePath+"added",false);
 		//set the prefs
+		
+		//if it wasnt added already
 		if (!wasAdded){
-			//store if it was saved, the slot and setup the next slot
+			
+			//mark the filepath saved so it does not get addeed 2x
 			editor.putBoolean(filePath+"added", true);
+			
+			//add slot0, filepath for first save slot1,fp for second etc
 			editor.putString("slot"+mRecentBookSlot, filePath);
-			editor.putInt("recent_book_slot", (mRecentBookSlot + 1) );
+			Log.d("file", "slot: "+mRecentBookSlot);
+			
+			//store the next slot to use
+			int nextSlot = mRecentBookSlot + 1;
+						
+			editor.putInt("recent_book_slot", nextSlot );
+			Log.d("file", "nxtslot: "+nextSlot);
 			
 		}
 

@@ -2,17 +2,13 @@ package com.duketek.orangespeedreader;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.Toast;
 import com.duketek.orangespeedreader.R;
 
 public class MainActivity extends Activity {
@@ -28,26 +24,27 @@ public class MainActivity extends Activity {
         gridview.setAdapter(new ImageAdapter(this));
 
         gridview.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+            @Override
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
             	
             	if (position == 0){
 		        	Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
 		        	startActivity(wordPlayer);
             	}
             	else if (position == 1){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), FileChooser.class);
-		        	startActivity(wordPlayer);
+		        	Intent fileChooser = new Intent(getApplicationContext(), FileChooser.class);
+		        	startActivity(fileChooser);
             	}
             	else if (position == 2){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), RecentBooksActivity.class);
-		        	startActivity(wordPlayer);
+		        	Intent recentBooks = new Intent(getApplicationContext(), RecentBooksActivity.class);
+		        	startActivity(recentBooks);
             	}else if (position == 3){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), SettingsActivity.class);
-		        	startActivity(wordPlayer);
+		        	Intent settings = new Intent(getApplicationContext(), SettingsActivity.class);
+		        	startActivity(settings);
             	}
             	else if (position == 4){
-		        	Intent wordPlayer = new Intent(getApplicationContext(), AboutActivity.class);
-		        	startActivity(wordPlayer);
+		        	Intent about = new Intent(getApplicationContext(), AboutActivity.class);
+		        	startActivity(about);
             	}
             	else if (position == 5){ //exit
 		        	//Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
@@ -66,14 +63,34 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        
+       
+        
         return true;
     }
     
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	
+    	case R.id.action_settings:
+    		Intent settings = new Intent(getApplicationContext(), SettingsActivity.class);
+        	startActivity(settings);
+    	    return true;
+    	
+    	case R.id.help:
+    		Intent help = new Intent(getApplicationContext(), HelpActivity.class);
+        	startActivity(help);
+        	return true;
+    	
+    	default:
+    		return super.onOptionsItemSelected(item);
+    	}
+    }
 }
-
-
-
-
 
 
 

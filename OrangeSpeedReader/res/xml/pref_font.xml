@@ -1,0 +1,135 @@
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:key="day_mode_checkbox"
+        android:summary="@string/pref_description_day_mode"
+        android:title="@string/pref_title_day_mode" 
+        android:defaultValue="true"
+    />
+    
+    
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+    	android:key="day_font_color_picker"
+    	android:title="@string/pref_title_day_font_color"
+	    android:summary="@string/pref_description_day_font_color"
+    	android:defaultValue="@color/OrangeRed"    			
+    	alphaSlider="false"                             
+	/>
+
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+    	android:key="day_background_color_picker"
+    	android:title="@string/pref_title_day_background_color"
+	    android:summary="@string/pref_description_day_background_color"
+    	android:defaultValue="@color/White"    			
+    	alphaSlider="false"                             
+	/>
+    
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+    	android:key="day_osd_color_picker"
+    	android:title="@string/pref_title_day_osd_color"
+	    android:summary="@string/pref_description_osd_color"
+    	android:defaultValue="@color/Black"    			
+    	alphaSlider="false"                             
+	/>
+    
+    
+    
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+    	android:key="night_font_color_picker"
+    	android:title="@string/pref_title_night_font_color"
+	    android:summary="@string/pref_description_night_font_color"
+    	android:defaultValue="@color/Black"    			
+    	alphaSlider="false"                             
+	/>
+    
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+    	android:key="night_background_color_picker"
+    	android:title="@string/pref_title_night_background_color"
+	    android:summary="@string/pref_description_night_background_color"
+    	android:defaultValue="@color/Cyan"    			
+    	alphaSlider="false"                             
+	/>
+    
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+    	android:key="night_osd_color_picker"
+    	android:title="@string/pref_title_night_osd_color"
+	    android:summary="@string/pref_description_night_osd_color"
+    	android:defaultValue="@color/Orange"    			
+    	alphaSlider="false"                             
+	/>
+    
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. 
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="@string/pref_default_display_name"
+        android:inputType="textCapWords"
+        android:key="example_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_display_name" />
+-->
+    <!--
+         NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it.
+    -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <ListPreference
+        android:key="font_list"
+        android:title="@string/pref_title_font"
+    	android:summary="@string/pref_description_font"
+        
+        android:defaultValue="SANS_SERIF"
+        android:entries="@array/pref_font_list"
+        android:entryValues="@array/pref_font_list_values"
+        
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        
+     />
+    
+    <ListPreference
+        android:key="font_style_list"
+        android:title="@string/pref_title_font_style"
+    	android:summary="@string/pref_description_font_style"
+        
+        android:defaultValue="NORMAL"
+        android:entries="@array/pref_font_style_list"
+        android:entryValues="@array/pref_font_style_list_values"
+        
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        
+
+ 	/>
+    
+    <ListPreference
+        android:key="font_size_list"
+        android:title="@string/pref_title_font_size"
+  
+        
+        android:defaultValue="NORMAL"
+        android:entries="@array/pref_font_size_list"
+        android:entryValues="@array/pref_font_size_list_values"
+        
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+  	/>
+  
+    <ListPreference
+        android:key="text_alignment_list"
+        android:title="@string/pref_title_text_alignment"
+    	android:summary="@string/pref_description_text_alignment"
+        
+        android:defaultValue="NORMAL"
+        android:entries="@array/pref_text_alignment_list"
+        android:entryValues="@array/pref_text_alignment_list_values"
+        
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+    />
+    
+    
+</PreferenceScreen>

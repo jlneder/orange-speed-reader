@@ -52,6 +52,7 @@ public class SettingsActivity extends PreferenceActivity {
 	 * device configuration dictates that a simplified, single-pane UI should be
 	 * shown.
 	 */
+	@SuppressWarnings("deprecation")
 	private void setupSimplePreferencesScreen() {
 		if (!isSimplePreferences(this)) {
 			return;
@@ -60,28 +61,47 @@ public class SettingsActivity extends PreferenceActivity {
 		// In the simplified UI, fragments are not used at all and we instead
 		// use the older PreferenceActivity APIs.
 
-		// Add 'general' preferences.
-		addPreferencesFromResource(R.xml.pref_general);
+		
+		//add a corresponding header.
+		
+		
+		// Add 'font' preferences.
+		
+		addPreferencesFromResource(R.xml.pref_font);
+		addPreferencesFromResource(R.xml.pref_player);
+		//PreferenceCategory fakeHeader = new PreferenceCategory(this);
+		//fakeHeader.setTitle(R.string.pref_header_font);
+		//getPreferenceScreen().addPreference(fakeHeader);
+		
+		
+		// Add 'player' preferences,
+		//fakeHeader = new PreferenceCategory(this);				
+		//fakeHeader.setTitle(R.string.pref_header_player);
+		//getPreferenceScreen().addPreference(fakeHeader);
+		
 
-		// Add 'notifications' preferences, and a corresponding header.
-		PreferenceCategory fakeHeader = new PreferenceCategory(this);
-		fakeHeader.setTitle(R.string.pref_header_notifications);
-		getPreferenceScreen().addPreference(fakeHeader);
-		addPreferencesFromResource(R.xml.pref_notification);
-
-		// Add 'data and sync' preferences, and a corresponding header.
-		fakeHeader = new PreferenceCategory(this);
-		fakeHeader.setTitle(R.string.pref_header_data_sync);
-		getPreferenceScreen().addPreference(fakeHeader);
-		addPreferencesFromResource(R.xml.pref_data_sync);
 
 		// Bind the summaries of EditText/List/Dialog/Ringtone preferences to
 		// their values. When their values change, their summaries are updated
 		// to reflect the new value, per the Android Design guidelines.
-		bindPreferenceSummaryToValue(findPreference("example_text"));
-		bindPreferenceSummaryToValue(findPreference("example_list"));
-		bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-		bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+		/*bindPreferenceSummaryToValue(findPreference("day_mode_checkbox"));
+		bindPreferenceSummaryToValue(findPreference("day_font_color_picker"));
+		bindPreferenceSummaryToValue(findPreference("day_background_color_picker"));
+		bindPreferenceSummaryToValue(findPreference("day_osd_color_picker"));
+		bindPreferenceSummaryToValue(findPreference("night_font_color_picker"));
+		bindPreferenceSummaryToValue(findPreference("night_background_color_picker"));
+		bindPreferenceSummaryToValue(findPreference("night_osd_color_picker"));
+		bindPreferenceSummaryToValue(findPreference("font_list"));
+		bindPreferenceSummaryToValue(findPreference("font_style_list"));
+		bindPreferenceSummaryToValue(findPreference("font_size_list"));
+		bindPreferenceSummaryToValue(findPreference("text_alignment_list"));
+		bindPreferenceSummaryToValue(findPreference("words_edit_text"));
+		bindPreferenceSummaryToValue(findPreference("default_wpm_edit_text"));
+		bindPreferenceSummaryToValue(findPreference("variable_speed_checkbox"));
+		bindPreferenceSummaryToValue(findPreference("slow_down_checkbox"));
+		bindPreferenceSummaryToValue(findPreference("new_chunk_at_end_checkbox"));
+		bindPreferenceSummaryToValue(findPreference("skip_stopwords_checkbox"));*/
+
 	}
 
 	/** {@inheritDoc} */
@@ -145,7 +165,7 @@ public class SettingsActivity extends PreferenceActivity {
 				// using RingtoneManager.
 				if (TextUtils.isEmpty(stringValue)) {
 					// Empty values correspond to 'silent' (no ringtone).
-					preference.setSummary(R.string.pref_ringtone_silent);
+					//preference.setSummary(R.string.pref_ringtone_silent);
 
 				} else {
 					Ringtone ringtone = RingtoneManager.getRingtone(
@@ -204,14 +224,25 @@ public class SettingsActivity extends PreferenceActivity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_general);
+			
+			addPreferencesFromResource(R.xml.pref_font);
 
 			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
 			// to their values. When their values change, their summaries are
 			// updated to reflect the new value, per the Android Design
 			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("example_text"));
-			bindPreferenceSummaryToValue(findPreference("example_list"));
+			bindPreferenceSummaryToValue(findPreference("day_mode_checkbox"));
+			bindPreferenceSummaryToValue(findPreference("day_font_color_picker"));
+			bindPreferenceSummaryToValue(findPreference("day_background_color_picker"));
+			bindPreferenceSummaryToValue(findPreference("day_osd_color_picker"));
+			bindPreferenceSummaryToValue(findPreference("night_font_color_picker"));
+			bindPreferenceSummaryToValue(findPreference("night_background_color_picker"));
+			bindPreferenceSummaryToValue(findPreference("night_osd_color_picker"));
+			bindPreferenceSummaryToValue(findPreference("font_list"));
+			bindPreferenceSummaryToValue(findPreference("font_style_list"));
+			bindPreferenceSummaryToValue(findPreference("font_size_list"));
+			bindPreferenceSummaryToValue(findPreference("text_alignment_list"));
+	
 		}
 	}
 
@@ -225,32 +256,23 @@ public class SettingsActivity extends PreferenceActivity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_notification);
+			
+			addPreferencesFromResource(R.xml.pref_player);
 
 			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
 			// to their values. When their values change, their summaries are
 			// updated to reflect the new value, per the Android Design
 			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
+
+			bindPreferenceSummaryToValue(findPreference("words_edit_text"));
+			bindPreferenceSummaryToValue(findPreference("default_wpm_edit_text"));
+			bindPreferenceSummaryToValue(findPreference("variable_speed_checkbox"));
+			bindPreferenceSummaryToValue(findPreference("slow_down_checkbox"));
+			bindPreferenceSummaryToValue(findPreference("new_chunk_at_end_checkbox"));
+			bindPreferenceSummaryToValue(findPreference("skip_stopwords_checkbox"));
+
 		}
 	}
 
-	/**
-	 * This fragment shows data and sync preferences only. It is used when the
-	 * activity is showing a two-pane settings UI.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class DataSyncPreferenceFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_data_sync);
-
-			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
-			// to their values. When their values change, their summaries are
-			// updated to reflect the new value, per the Android Design
-			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-		}
-	}
+	
 }

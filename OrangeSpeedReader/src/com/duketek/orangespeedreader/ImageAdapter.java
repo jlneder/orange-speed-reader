@@ -1,20 +1,12 @@
 package com.duketek.orangespeedreader;
 
-import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
 import com.duketek.orangespeedreader.R;
-import com.duketek.orangespeedreader.R.id;
-
 import android.content.Context;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -74,7 +66,7 @@ public class ImageAdapter extends BaseAdapter {
 	    
 	    mImageView.setImageResource(btnPics[position]);
 	    mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-	    mImageView.setPadding(8, 8, 8, 8);
+	    mImageView.setPadding(8, 18, 8, 18);
 	    
 	    mTextView.setText(btnText[position]);
 	    
@@ -126,7 +118,7 @@ public class ImageAdapter extends BaseAdapter {
 	    // add pictures to gridshow pretty pictures on the main activity
 	private Integer[] btnPics = { 	R.drawable.play, R.drawable.sd_card, 
 									R.drawable.collection, android.R.drawable.ic_menu_preferences, 
-									android.R.drawable.ic_menu_more, android.R.drawable.ic_menu_close_clear_cancel };
+									R.drawable.ic_launcher, android.R.drawable.ic_menu_close_clear_cancel };
 
 	    // add text to layout
 	static final String[] btnText = new String[] { 	"Resume Reading", "Open Book", 

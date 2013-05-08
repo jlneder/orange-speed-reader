@@ -8,35 +8,36 @@
 
     <!-- Font settings -->
     <string name="pref_header_font">Font</string>
-    
+        
     
     <string name="pref_title_day_mode">Day Mode</string>
     <string name="pref_description_day_mode">Disable for night mode</string>
     
     
-    <string name="pref_title_day_font_color">Daytime Font Color</string>
+    <string name="pref_title_day_font_color">Font Color (Daytime)</string>
     <string name="pref_description_day_font_color">Color of the font for the Word Player in day mode</string>
     
-    <string name="pref_title_day_background_color">Daytime Background Color</string>
+    <string name="pref_title_day_background_color">Background Color (Daytime)</string>
     <string name="pref_description_day_background_color">Color of the background for the word player in day mode</string>
     
-    <string name="pref_title_day_background_color">Daytime Slider Color</string>
-    <string name="pref_description_day_background_color">Color of the slider and overlay text in day mode</string>
+    <string name="pref_title_day_osd_color">On Screen Display Color (Daytime)</string>
+    <string name="pref_description_osd_color">Color of the overlay text in day mode</string>
 
-    <string name="pref_title_night_font_color">Night Time Font Color</string>
+    
+    <string name="pref_title_night_font_color">Font Color (Nighttime)</string>
     <string name="pref_description_night_font_color">Color of the font for the word player in night mode</string>
     
-    <string name="pref_title_night_background_color">Night Time Background Color</string>
+    <string name="pref_title_night_background_color">Background Color (Nighttime)</string>
     <string name="pref_description_night_background_color">Color of the background for the Word Player in night mode</string>
     
-	<string name="pref_title_day_background_color">Night Time Slider Color</string>
-    <string name="pref_description_day_background_color">Color of the slider and overlay text in night mode</string>
+	<string name="pref_title_night_osd_color">On Screen Display Color (Nighttime)</string>
+    <string name="pref_description_night_osd_color">Color of the slider and overlay text in night mode</string>
     
     
     
     <string name="pref_title_font">Font</string>
     <string name="pref_description_font">The Font for the Word Player</string>
-    <string-array name="pref_font_list_font">
+    <string-array name="pref_font_list">
         <item>Droid Sans</item>
         <item>Droid Serif</item>
         <item>Droid Sans Mono</item>
@@ -48,8 +49,8 @@
     </string-array>    
     
     <string name="pref_title_font_style">Font Style</string>
-    <string name="pref_description_font_style">Italics, Bold, Bold and Italic</string>
-    <string-array name="pref_font_style_list_font">
+    <string name="pref_description_font_style">Bold and Italic</string>
+    <string-array name="pref_font_style_list">
         <item>Normal</item>
         <item>Bold</item>
         <item>Italic</item>
@@ -60,20 +61,67 @@
         <item>BOLD</item>
         <item>ITALIC</item>
         <item>BOLD_ITALIC</item>
-	</string-array>    
-    
-    
-    
+	</string-array>       
     
     
     <string name="pref_title_font_size">Font Size</string>
     <!--  <string name="pref_description_font_size"></string>-->
+    <string-array name="pref_font_size_list">
+        <item>Micro</item>
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+        <item>Extra Large</item>
+        <item>XXL</item>
+        <item>Huge</item>
+	</string-array>
+    
+    <string-array name="pref_font_size_list_values">
+        <item>12sp</item>
+        <item>14sp</item>
+        <item>18sp</item>
+        <item>22sp</item>
+        <item>50sp</item>
+        <item>65sp</item>
+        <item>75sp</item>
+	</string-array>       
     
     <string name="pref_title_text_alignment">Text Alignment</string>
     <string name="pref_description_text_alignment">Where the words are on the screen</string>
+    <string-array name="pref_text_alignment_list">
+        <item>Top Left</item>
+        <item>Top Middle</item>
+        <item>Top Right</item>
+ 
+        <item>Center Left</item>
+        <item>Center Middle</item>
+        <item>Center Right</item>
+ 
+        <item>Bottom Left</item>
+        <item>Bottom Middle</item>
+        <item>Bottom Right</item>
+ </string-array>
+    <string-array name="pref_text_alignment_list_values">
+        <item>top|left</item>
+        <item>top|center</item>
+        <item>top|right</item>
+ 
+        <item>center|left</item>
+        <item>center</item>
+        <item>center|right</item>
+ 
+        <item>bottom|left</item>
+        <item>bottom|center</item>
+        <item>bottom|right</item>
+ 	</string-array>       
     
-    <!-- Playback settings -->
-    <string name="pref_header_playback">Playback</string>
+    
+    
+    
+    
+    
+    <!-- player settings     -->
+    <string name="pref_header_player">Player</string>
     
     <string name="pref_title_words">Words at a time</string>
     <string name="pref_description_words">The number of words flashed on the screen at a time.</string>
@@ -82,21 +130,21 @@
     <string name="pref_description_default_wpm">The speed of the word player when opening a new book</string>
     
     <string name="pref_title_variable_speed">Variable Speed Words</string>
-    <string name="pref_description_variable_speed">The number of words flashed on the screen at a time.</string>
+    <string name="pref_description_variable_speed">Slow down the player on puncuation, on when checked.</string>
     
-    <string name="pref_title_slow_down">Variable Speed Words</string>
-    <string name="pref_description_slow_down">The number of words flashed on the screen at a time.</string>
+    <string name="pref_title_slow_down">Slow down on large words</string>
+    <string name="pref_description_slow_down">Reduce speed when long words appear, on when checked.</string>
     
-    <string name="pref_title_new_chunk_at_end">Variable Speed Words</string>
-    <string name="pref_description_new_chunk_at_end">The number of words flashed on the screen at a time.</string>
+    <string name="pref_title_new_chunk_at_end">New Chuck start at beginning of sentence.</string>
+    <string name="pref_description_new_chunk_at_end">Don\'t leave a period in the middle of a chunk of words on when checked.</string>
     
-    <string name="pref_title_skip_articles">Variable Speed Words</string>
-    <string name="pref_description_skip_articles">The number of words flashed on the screen at a time.</string>
+    <string name="pref_title_skip_stopwords">Skip over stopwords</string>
+    <string name="pref_description_skip_stopwords">Don\'t bother displaying the words the, is, at, which, on. This setting is on when checked.</string>
+
     
     
     
-    
-    <!-- Example settings for Data & Sync -->
+    <!-- Example settings for Data & Sync 
     <string name="pref_header_data_sync">Data &amp; sync</string>
     <string name="pref_title_sync_frequency">Sync frequency</string>
 
@@ -118,13 +166,13 @@
     </string-array>
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
+-->
+    <!-- Example settings for Notifications 
     <string name="pref_header_notifications">Notifications</string>
     <string name="pref_title_new_message_notifications">New message notifications</string>
     <string name="pref_title_ringtone">Ringtone</string>
     <string name="pref_ringtone_silent">Silent</string>
     <string name="pref_title_vibrate">Vibrate</string>
-
+-->
 
 </resources>

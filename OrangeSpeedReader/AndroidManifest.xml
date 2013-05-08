@@ -15,15 +15,18 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        
         <activity
             android:name="com.duketek.orangespeedreader.MainActivity"
+            android:configChanges="orientation"
             android:label="@string/app_name" >
+			
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
         <activity
             android:name="com.duketek.orangespeedreader.WordPlayerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -34,16 +37,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.duketek.orangespeedreader.MainActivity" />
         </activity>
+        
         <activity
             android:name="com.duketek.orangespeedreader.SettingsActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_settings" >
         </activity>
+        
         <activity
             android:name="com.duketek.orangespeedreader.BtnBox"
             android:label="@string/title_activity_btn_box" >
         </activity>
+        
         <activity
             android:name="com.duketek.orangespeedreader.FileChooser"
+            android:configChanges="orientation"
             android:label="@string/title_activity_file_chooser" >
         </activity>
 
@@ -61,18 +69,30 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
+        
         <activity
             android:name="com.duketek.orangespeedreader.PlayerActivity"
             android:label="@string/title_activity_player" >
         </activity>
+        
         <activity
             android:name="com.duketek.orangespeedreader.RecentBooksActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_recent_books" >
         </activity>
+        
         <activity
             android:name="com.duketek.orangespeedreader.AboutActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_about" >
         </activity>
+        
+        <activity
+            android:name="com.duketek.orangespeedreader.HelpActivity"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_help" >
+        </activity>
+        
     </application>
 
 </manifest>

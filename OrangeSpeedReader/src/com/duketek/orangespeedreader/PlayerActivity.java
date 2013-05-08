@@ -146,7 +146,8 @@ public class PlayerActivity extends Activity {
 	 
 	  
 	 
-	  public void onStart() {
+	  @Override
+	public void onStart() {
 	    super.onStart();
 	    isRunning.set(true);
 	    
@@ -158,14 +159,16 @@ public class PlayerActivity extends Activity {
 	    
 	  }
 	 
-	  public void onStop() {
+	  @Override
+	public void onStop() {
 	    super.onStop();
 	    isRunning.set(false);
 	  }
 	 
 	  	  
 	  protected class UpdateTask extends Thread implements Runnable {
-	    public void run() {
+	    @Override
+		public void run() {
 	    	
 	    	 BufferedReader textReader = loadFile();
 			 // String mLine = getNextLine(textReader);

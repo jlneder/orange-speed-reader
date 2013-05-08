@@ -1,8 +1,11 @@
 package com.duketek.orangespeedreader;
 
-import com.duketek.orangespeedreader.R;
-import com.duketek.orangespeedreader.PlayerActivity.UpdateTask;
-import com.duketek.orangespeedreader.util.SystemUiHider;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -11,25 +14,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.MenuItem;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v4.app.NavUtils;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
+import com.duketek.orangespeedreader.util.SystemUiHider;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -113,7 +108,7 @@ public class WordPlayerActivity extends Activity {
 			wordsTxtView.setText((String)msg.obj);
 			
 			pcnt = ( (double)mProgress / (double)mWordCount) * 100.0d;
-			ETA = ( (double)mWordCount - (double)mProgress ) / (double)mWPM;
+			ETA = ( (double)mWordCount - (double)mProgress ) / mWPM;
 			mProgressText.setText( 	mProgress + "/" + mWordCount +
 									" " + String.format("%.2f",pcnt) + "%" +
 									" ETA: "+String.format("%.2f",ETA) + "min"  
@@ -139,19 +134,34 @@ public class WordPlayerActivity extends Activity {
 		
 		//make sure to set content so a null pointer exception does not get thrown by the findViewById method
 		setContentView(R.layout.activity_word_player);
+		Log.d(TAG,"set content view: ");
+		
+		
+		//this is the overlay pop up
+		final View controlsView = findViewById(R.id.fullscreen_content_controls);
+		//this one is always visible
+		final View contentView = findViewById(R.id.fullscreen_content);
 		
 		//assign variable to the TextView
 		wordsTxtView = (TextView) findViewById(R.id.fullscreen_content);
-		
+		Log.d(TAG,"set fullscreen content: ");
 		
 		//load the last file selected.
 		mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		mFilePath = mPrefs.getString("recent_book","");
+		
+		
 		mBookmark = mPrefs.getInt(mFilePath+"bookmark",0);
+		
 		mWPM = mPrefs.getInt(mFilePath+"WPM",250);
 		
-		Log.d(TAG,mFilePath+" file path from settings");
 		
+		
+		
+		
+		
+		Log.d(TAG,"file path from settings: "+ mFilePath);
+		Log.d(TAG,"wpm from settings: "+ mWPM);
 		
 		
 		
@@ -183,27 +193,31 @@ public class WordPlayerActivity extends Activity {
 		 mProgressBar.setMax(mWordCount);
 		 mProgressBar.setProgress(mBookmark);
 		 
+		 
+		 
 
 		 mProgressBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
-			 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			 @Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				 // Log the progress
 				 Log.d("DEBUG", "Progress is: "+progress);
 				 //set textView's text
 				 double pcnt = ((double)progress / (double)mProgressBar.getMax()*100.0d);
 								
 				//mProgressText.setText( progress + "/" + mProgressBar.getMax() +" "+  String.format("%.2f",pcnt) + "%" );
-				 ETA = ( (double)mWordCount - (double)mProgress ) / (double)mWPM;
+				 ETA = ( (double)mWordCount - (double)mProgress ) / mWPM;
 				 mProgressText.setText( 	progress + "/" + mWordCount +
 						" " + String.format("%.2f",pcnt) + "%" +
 						" ETA: "+String.format("%.2f",ETA) + "min"  
 						);
 				//only run on updates (needed?)
 				mProgress = progress;
-				
-				
-			}
+			 }
+		 
+			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {}
 			
+			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
 			
 				//restart thread after lifting finger off the bar
@@ -233,21 +247,24 @@ public class WordPlayerActivity extends Activity {
 		mSpeedText.setText( mWPM+ " WPM");
 		mSpeedBar.setProgress(mWPM);
 		mSpeedBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				// Log the progress
 				Log.d("DEBUG", "WPM is: "+progress);
 				//set textView's text
 				mSpeedText.setText(progress + " WPM");
 				mWPM = progress;
-				ETA = ( (double)mWordCount - (double)mProgress ) / (double)mWPM;
+				ETA = ( (double)mWordCount - (double)mProgress ) / mWPM;
 				mProgressText.setText( 	mProgress + "/" + mWordCount +
 						" " + String.format("%.2f",pcnt) + "%" +
 						" ETA: "+String.format("%.2f",ETA) + "min"  
 						);
 			}
 
+			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {}
 
+			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {}
 
 		}	);
@@ -268,10 +285,7 @@ public class WordPlayerActivity extends Activity {
 		
 		
 		
-		//this is the overlay pop up
-		final View controlsView = findViewById(R.id.fullscreen_content_controls);
-		//this one is always visible
-		final View contentView = findViewById(R.id.fullscreen_content);
+		
 
 		
 		
@@ -282,6 +296,9 @@ public class WordPlayerActivity extends Activity {
 		// this activity.
 
 		setupActionBar();
+		
+		
+		
 		mSystemUiHider = SystemUiHider.getInstance(this, contentView,HIDER_FLAGS);
 		mSystemUiHider.setup();
 
@@ -384,6 +401,7 @@ public class WordPlayerActivity extends Activity {
 	
 	
 	
+	@Override
 	public void onStart() {
 	    super.onStart();
 	    //isRunning.set(true);
@@ -392,12 +410,18 @@ public class WordPlayerActivity extends Activity {
 	    //updateTask.start();
 	    
 	    if (mPaused == false){
+	    	
 	    	if (mBookmark >0){
 				//mProgress = mBookmark;
-				 mTextReader =  loadLocation(mBookmark);
-				 Log.d(TAG,"mBookmark starting #: "+mBookmark);
-				 mNewLocation.set(true);
-			 }
+	    		mTextReader =  loadLocation(mBookmark);
+	    		Log.d(TAG,"mBookmark starting #: "+mBookmark);
+	    		mNewLocation.set(true);
+			}
+	    	else{
+	    		mTextReader =  loadLocation(0);
+	    		Log.d(TAG,"mBookmark starting #: "+0);
+	    		mNewLocation.set(true);
+	    	}
 			//mTextReader = loadFile();
 			
 			
@@ -416,6 +440,7 @@ public class WordPlayerActivity extends Activity {
 	
 	
 	
+	@Override
 	public void onResume() {
 	    super.onResume();
 	    synchronized (mPauseLock) {
@@ -427,6 +452,7 @@ public class WordPlayerActivity extends Activity {
 	
 	
 	
+	@Override
 	public void onPause() {
 	    super.onPause();
 	    
@@ -441,6 +467,7 @@ public class WordPlayerActivity extends Activity {
 	
 	
 	
+	@Override
 	public void onStop() {
 	    super.onStop();
 	    
@@ -572,7 +599,7 @@ public class WordPlayerActivity extends Activity {
 		  for (int i = b; i < mark; i++){
 			  b = b++;
 		  }
-		  //Log.d(TAG,"returned: " +b+"");
+		  Log.d(TAG,"returned: " +b+"");
 		  
 		  //replace existing buffer with the new one
 		  //mTextReader = seekReader;
@@ -587,7 +614,8 @@ public class WordPlayerActivity extends Activity {
 	  
 	  
 	  protected class UpdateTask extends Thread implements Runnable {
-		  public void run() {
+		  @Override
+		public void run() {
 			  int delay = 0;
 
 			  //BufferedReader textReader = loadFile();
