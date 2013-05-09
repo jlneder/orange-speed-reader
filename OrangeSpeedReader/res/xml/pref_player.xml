@@ -5,14 +5,7 @@
          A 'parent' preference, which enables/disables child preferences (below)
          when checked/unchecked.
     -->
-    <EditTextPreference
-        android:key="words_edit_text"
-        android:title="@string/pref_title_words"
-    	android:summary="@string/pref_description_font"    
-    	
-    	android:defaultValue="1"
-        android:numeric="integer"
-	/>
+    
     
     <EditTextPreference
         android:key="default_wpm_edit_text"
@@ -22,6 +15,15 @@
     	android:defaultValue="250"
         android:numeric="integer"
 	/>
+    
+    <!-- <EditTextPreference
+        android:key="chunk_size_edit_text"
+        android:title="@string/pref_title_chunk_size"
+    	android:summary="@string/pref_description_chunk_size"    
+    	
+    	android:defaultValue="1"
+        android:numeric="integer"
+	/> -->
     
      <CheckBoxPreference
         android:key="variable_speed_checkbox"
@@ -40,12 +42,20 @@
     />
      
      <CheckBoxPreference
+        android:key="random_speed_checkbox"
+        android:title="@string/pref_title_random_speed" 
+        android:summary="@string/pref_description_random_speed"
+       
+        android:defaultValue="false"
+    />
+     
+     <!-- <CheckBoxPreference
         android:key="new_chunk_at_end_checkbox"
         android:title="@string/pref_title_new_chunk_at_end" 
         android:summary="@string/pref_description_new_chunk_at_end"
        
         android:defaultValue="false"
-    />
+    /> -->
      
       <CheckBoxPreference
         android:key="skip_stopwords_checkbox"
@@ -55,5 +65,13 @@
         android:defaultValue="false"
     />
     
+      <CheckBoxPreference
+        android:key="skip_vowels_checkbox"
+        android:title="@string/pref_title_skip_vowels" 
+        android:summary="@string/pref_description_skip_vowels"
+       
+        android:defaultValue="false"
+    />
+      
     
 </PreferenceScreen>

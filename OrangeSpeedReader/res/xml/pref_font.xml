@@ -9,6 +9,8 @@
     />
     
     
+    
+    
     <net.margaritov.preference.colorpicker.ColorPickerPreference
     	android:key="day_font_color_picker"
     	android:title="@string/pref_title_day_font_color"
@@ -39,7 +41,7 @@
     	android:key="night_font_color_picker"
     	android:title="@string/pref_title_night_font_color"
 	    android:summary="@string/pref_description_night_font_color"
-    	android:defaultValue="@color/Black"    			
+    	android:defaultValue="@color/Cyan"    			
     	alphaSlider="false"                             
 	/>
     
@@ -47,7 +49,7 @@
     	android:key="night_background_color_picker"
     	android:title="@string/pref_title_night_background_color"
 	    android:summary="@string/pref_description_night_background_color"
-    	android:defaultValue="@color/Cyan"    			
+    	android:defaultValue="@color/Black"    			
     	alphaSlider="false"                             
 	/>
     
@@ -59,6 +61,7 @@
     	alphaSlider="false"                             
 	/>
     
+
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. 
     <EditTextPreference
@@ -81,7 +84,7 @@
         android:title="@string/pref_title_font"
     	android:summary="@string/pref_description_font"
         
-        android:defaultValue="SANS_SERIF"
+        android:defaultValue="8"
         android:entries="@array/pref_font_list"
         android:entryValues="@array/pref_font_list_values"
         
@@ -90,27 +93,12 @@
         
      />
     
-    <ListPreference
-        android:key="font_style_list"
-        android:title="@string/pref_title_font_style"
-    	android:summary="@string/pref_description_font_style"
         
-        android:defaultValue="NORMAL"
-        android:entries="@array/pref_font_style_list"
-        android:entryValues="@array/pref_font_style_list_values"
-        
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        
-
- 	/>
-    
     <ListPreference
         android:key="font_size_list"
-        android:title="@string/pref_title_font_size"
-  
+        android:title="@string/pref_title_font_size"  
         
-        android:defaultValue="NORMAL"
+        android:defaultValue="50"
         android:entries="@array/pref_font_size_list"
         android:entryValues="@array/pref_font_size_list_values"
         
@@ -123,7 +111,7 @@
         android:title="@string/pref_title_text_alignment"
     	android:summary="@string/pref_description_text_alignment"
         
-        android:defaultValue="NORMAL"
+        android:defaultValue="5"
         android:entries="@array/pref_text_alignment_list"
         android:entryValues="@array/pref_text_alignment_list_values"
         

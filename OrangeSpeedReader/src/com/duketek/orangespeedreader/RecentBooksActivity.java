@@ -94,9 +94,9 @@ public class RecentBooksActivity extends ListActivity {
 				editor.commit();
 				//launce the player app after selection
 				
-				//Intent wordPlayerIntent = new Intent(getApplicationContext(), WordPlayerActivity.class);
+				Intent wordPlayerIntent = new Intent(getApplicationContext(), WordPlayerActivity.class);
 				//declared in the activity body
-				//startActivity(wordPlayerIntent);
+				startActivity(wordPlayerIntent);
 
 			}                 
 		} );

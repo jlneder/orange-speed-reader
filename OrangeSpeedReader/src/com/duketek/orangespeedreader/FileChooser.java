@@ -15,23 +15,29 @@ import com.ipaulpro.afilechooser.utils.FileUtils;
 
 public class FileChooser extends Activity {
 
-	private static final int REQUEST_CODE = 6384; // onActivityResult request code
+	private static final int REQUEST_CODE = 123; 
 
 	public static final String PREFS_NAME = "OrangeSettings";
 	private String filePath;
 	private SharedPreferences mPrefs;
 	private int mRecentBookSlot;
+	private String mLastBook;
 	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		
+		
 		mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		mRecentBookSlot = mPrefs.getInt("recent_book_slot",0);
-		
+		mLastBook = mPrefs.getString("recent_book","");
 		
 		showChooser();
+		//finish();
+		
+    	
 		
 	}
 
@@ -39,13 +45,15 @@ public class FileChooser extends Activity {
 		// Use the GET_CONTENT intent from the utility class
 		Intent target = FileUtils.createGetContentIntent();
 		// Create the chooser Intent
+		//Intent target = FileUtils.createGetContentIntent();
 		Intent fileOpenIntent = Intent.createChooser(target, getString(R.string.title_activity_file_chooser));
-		//Intent fileOpenIntent = new Intent(getApplicationContext(), FileChooser.class);
+		
 		
 		try {
 			startActivityForResult(fileOpenIntent, REQUEST_CODE);
 			target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			//finish();
+			
+		
 			
 			
 		} catch (ActivityNotFoundException e) {
@@ -69,6 +77,9 @@ public class FileChooser extends Activity {
 						// Create a file instance from the URI
 						final File file = FileUtils.getFile(uri);
 						
+						if (file.isFile() ){
+							
+						
 						//save the selected file path
 						filePath =  file.getAbsolutePath();
 						
@@ -80,11 +91,19 @@ public class FileChooser extends Activity {
 						//Toast.makeText(FileChooser.this,"File Selected: " + file.getAbsolutePath(),Toast.LENGTH_LONG).show();
 						
 						//start the word player 
-						//Intent wordPlayerIntent = new Intent(getApplicationContext(), WordPlayerActivity.class);
+						}
+						else{
+							if(!mLastBook.equals("")){
+								filePath = mLastBook; 
+								this.finish();
+							}
+							
+						}
 						
-						
-						
-						//startActivity(wordPlayerIntent);
+						Intent wordPlayer = new Intent(getApplicationContext(), WordPlayerActivity.class);
+				    	startActivity(wordPlayer);
+				    	
+				    	
 						
 					} catch (Exception e) {
 						Log.e("FileSelectorTestActivity", "File select error",	e);
@@ -96,9 +115,19 @@ public class FileChooser extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
+	
+//		  @Override
+//			public void onResume() {
+//			    super.onResume();
+//			    
+//			    this.finish();
+//				    
+//		  }
+	  
+	
 	@Override
-	protected void onStop(){
-		super.onStop();
+	protected void onPause(){
+		super.onPause();
        	//load up shared prefs for storage
 		//SharedPreferences mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		SharedPreferences.Editor editor = mPrefs.edit();
@@ -107,7 +136,7 @@ public class FileChooser extends Activity {
 		//set the prefs
 		
 		//if it wasnt added already
-		if (!wasAdded){
+		if (!wasAdded ){
 			
 			//mark the filepath saved so it does not get addeed 2x
 			editor.putBoolean(filePath+"added", true);
@@ -124,11 +153,12 @@ public class FileChooser extends Activity {
 			
 		}
 
+		
 		editor.putString("recent_book", filePath );
 
 		//commit the changes
 		editor.commit();
-
+		
       
     }
 

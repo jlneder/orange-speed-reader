@@ -16,6 +16,8 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.util.Log;
+
 import com.duketek.orangespeedreader.R;
 
 import java.util.List;
@@ -233,6 +235,7 @@ public class SettingsActivity extends PreferenceActivity {
 			// guidelines.
 			bindPreferenceSummaryToValue(findPreference("day_mode_checkbox"));
 			bindPreferenceSummaryToValue(findPreference("day_font_color_picker"));
+			
 			bindPreferenceSummaryToValue(findPreference("day_background_color_picker"));
 			bindPreferenceSummaryToValue(findPreference("day_osd_color_picker"));
 			bindPreferenceSummaryToValue(findPreference("night_font_color_picker"));

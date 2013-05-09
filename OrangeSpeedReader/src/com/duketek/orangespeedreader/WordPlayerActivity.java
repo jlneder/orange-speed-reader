@@ -4,18 +4,23 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,6 +29,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.duketek.orangespeedreader.R.color;
 import com.duketek.orangespeedreader.util.SystemUiHider;
 
 /**
@@ -33,6 +39,45 @@ import com.duketek.orangespeedreader.util.SystemUiHider;
  * @see SystemUiHider
  */
 public class WordPlayerActivity extends Activity {
+
+	
+	
+	
+	
+	private final static int ROBOTO_THIN = 0;
+	private final static int ROBOTO_THIN_ITALIC = 1;
+	private final static int ROBOTO_LIGHT = 2;
+	private final static int ROBOTO_LIGHT_ITALIC = 3;
+	private final static int ROBOTO_REGULAR = 4;
+	private final static int ROBOTO_ITALIC = 5;
+	private final static int ROBOTO_MEDIUM = 6;
+	private final static int ROBOTO_MEDIUM_ITALIC = 7;
+	private final static int ROBOTO_BOLD = 8;
+	private final static int ROBOTO_BOLD_ITALIC = 9;
+	private final static int ROBOTO_BLACK = 10;
+	private final static int ROBOTO_BLACK_ITALIC = 11;
+	private final static int ROBOTO_CONDENSED = 12;
+	private final static int ROBOTO_CONDENSED_ITALIC = 13;
+	private final static int ROBOTO_CONDENSED_BOLD = 14;
+	private final static int ROBOTO_CONDENSED_BOLD_ITALIC = 15;
+	
+	private final static int TOP_LEFT = 1;
+	private final static int TOP_MIDDLE = 2;
+	private final static int TOP_RIGHT = 3;
+	private final static int CENTER_LEFT = 4;
+	private final static int CENTER = 5;
+	private final static int CENTER_RIGHT = 6;
+	private final static int BOTTOM_LEFT = 7;
+	private final static int BOTTOM_MIDDLE = 8;
+	private final static int BOTTOM_RIGHT = 9;
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -99,8 +144,12 @@ public class WordPlayerActivity extends Activity {
 	protected AtomicBoolean stopFlag=new AtomicBoolean(false);
 	protected UpdateTask updateTask = new UpdateTask();
 	
-	
-	
+	private boolean variable_speed;
+	private boolean slow_down;
+	private boolean random_speed;
+	private boolean skip_stopwords;
+	private int chunk_size;
+	boolean skip_vowels;
 	
 	protected Handler handler = new Handler() {
 		@Override
@@ -140,23 +189,190 @@ public class WordPlayerActivity extends Activity {
 		//this is the overlay pop up
 		final View controlsView = findViewById(R.id.fullscreen_content_controls);
 		//this one is always visible
-		final View contentView = findViewById(R.id.fullscreen_content);
+		//final View contentView = findViewById(R.id.fullscreen_content);
 		
 		//assign variable to the TextView
 		wordsTxtView = (TextView) findViewById(R.id.fullscreen_content);
 		Log.d(TAG,"set fullscreen content: ");
 		
+		//load the defaults without having to initialize
+		PreferenceManager.setDefaultValues(this, R.xml.pref_font, false);
+		PreferenceManager.setDefaultValues(this, R.xml.pref_player, false);
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		
+		
+		
+		//assign seekbars and seek text to variables
+		mSpeedText = (TextView) findViewById(R.id.textViewWPM);
+		mSpeedBar = (SeekBar) findViewById(R.id.wpmBar);
+		
+		
+		
+		//setup progress bar and text
+		 mProgressText = (TextView) findViewById(R.id.textViewPages);
+		 mProgressText.setText(mBookmark + "/" + mWordCount);
+		 //mProgressBar = (SeekBar) findViewById(R.id.progressBar);
+		 //mProgressBar.setMax(mWordCount);
+		
+		
 		//load the last file selected.
 		mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		mFilePath = mPrefs.getString("recent_book","");
+		Log.d(TAG,"recent_book:"+mFilePath);
 		
+		if(mFilePath.equals("")){
+        	Toast.makeText(WordPlayerActivity.this,"Please Open a book first",Toast.LENGTH_LONG).show();
+        	this.finish();
+		}
+				
+		//check if day or night colors should be loaded
+		boolean day_mode_checkbox = settings.getBoolean("day_mode_checkbox", true);
+		if(day_mode_checkbox){
+			//load day colors
+			int day_font_color_picker = settings.getInt("day_font_color_picker", color.OrangeRed);
+			int day_background_color_picker = settings.getInt("day_background_color_picker", color.White);
+			int day_osd_color_picker = settings.getInt("day_osd_color_picker", color.Black);
+			wordsTxtView.setTextColor(day_font_color_picker);
+			wordsTxtView.setBackgroundColor(day_background_color_picker);
+			mSpeedText.setTextColor(day_osd_color_picker);
+			mProgressText.setTextColor(day_osd_color_picker);
+			Log.d(TAG,"daytxt "+day_font_color_picker);
+			Log.d(TAG,"daytxt "+day_background_color_picker);
+			Log.d(TAG,"daytxt "+day_osd_color_picker);
+			
+		}
+		else{
+			//load night colors
+			int night_font_color_picker = settings.getInt("night_font_color_picker", color.OrangeRed);
+			int night_background_color_picker = settings.getInt("night_background_color_picker", color.OrangeRed);
+			int night_osd_color_picker = settings.getInt("night_osd_color_picker", color.OrangeRed);
+			wordsTxtView.setTextColor(night_font_color_picker);
+			wordsTxtView.setBackgroundColor(night_background_color_picker);
+			mSpeedText.setTextColor(night_osd_color_picker);
+			mProgressText.setTextColor(night_osd_color_picker);
+
+			
+		}
+		int font_list = Integer.parseInt( settings.getString("font_list","8") );
+		
+		
+		
+		Typeface font;
+	    switch (font_list) {
+	        case ROBOTO_THIN:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-Thin.ttf");
+	            break;
+	        case ROBOTO_THIN_ITALIC:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-ThinItalic.ttf");
+	            break;
+	        case ROBOTO_LIGHT:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-Light.ttf");
+	            break;
+	        case ROBOTO_LIGHT_ITALIC:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-LightItalic.ttf");
+	            break;
+	        case ROBOTO_REGULAR:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-Regular.ttf");
+	            break;
+	        case ROBOTO_ITALIC:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-Italic.ttf");
+	            break;
+	        case ROBOTO_MEDIUM:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-Medium.ttf");
+	            break;
+	        case ROBOTO_MEDIUM_ITALIC:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-MediumItalic.ttf");
+	            break;
+	        case ROBOTO_BOLD:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-Bold.ttf");
+	            break;
+	        case ROBOTO_BOLD_ITALIC:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-BoldItalic.ttf");
+	            break;
+	        case ROBOTO_BLACK:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-Black.ttf");
+	            break;
+	        case ROBOTO_BLACK_ITALIC:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-BlackItalic.ttf");
+	            break;
+	        case ROBOTO_CONDENSED:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-Condensed.ttf");
+	            break;
+	        case ROBOTO_CONDENSED_ITALIC:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-CondensedItalic.ttf");
+	            break;
+	        case ROBOTO_CONDENSED_BOLD:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-BoldCondensed.ttf");
+	            break;
+	        case ROBOTO_CONDENSED_BOLD_ITALIC:
+	            font = Typeface.createFromAsset(getBaseContext().getAssets(), "fonts/Roboto-BoldCondensedItalic.ttf");
+	            break;
+	        default:
+	            throw new IllegalArgumentException("Unknown `typeface` attribute value " + font_list);
+	    }
+		//apply the font setting to the Text View
+	    wordsTxtView.setTypeface(font);
+		
+	    int font_size = Integer.parseInt( settings.getString("font_size_list","50") );
+	    wordsTxtView.setTextSize(font_size);
+	    
+	    int text_alignment = Integer.parseInt(settings.getString("text_alignment_list","5") );
+	    
+	    
+	    switch (text_alignment) {
+	        case TOP_LEFT:
+	            wordsTxtView.setGravity(Gravity.TOP | Gravity.LEFT);
+	            break;
+	        case TOP_MIDDLE:
+	        	 wordsTxtView.setGravity(Gravity.TOP | Gravity.CENTER);
+	        	 break;
+	        case TOP_RIGHT:
+	        	 wordsTxtView.setGravity(Gravity.TOP | Gravity.RIGHT);
+	        	 break;
+	        case CENTER_LEFT:
+	        	 wordsTxtView.setGravity(Gravity.CENTER | Gravity.LEFT);
+	        	 break;
+	        case CENTER:
+	        	 wordsTxtView.setGravity(Gravity.CENTER);
+	        	 break;
+	        case CENTER_RIGHT:
+	        	 wordsTxtView.setGravity(Gravity.CENTER | Gravity.RIGHT);
+	        	 break;
+	        case BOTTOM_LEFT:
+	        	 wordsTxtView.setGravity(Gravity.BOTTOM | Gravity.LEFT);
+	        	 break;
+	        case BOTTOM_MIDDLE:
+	        	 wordsTxtView.setGravity(Gravity.BOTTOM | Gravity.CENTER);
+	        	 break;
+	        case BOTTOM_RIGHT:
+	        	 wordsTxtView.setGravity(Gravity.BOTTOM | Gravity.RIGHT);
+	        	 break;
+	        default:
+	            break;
+	    }
+	    
+	    
+	    int default_wpm = Integer.parseInt( settings.getString("default_wpm_edit_text","250") );
+	    
+	    variable_speed = settings.getBoolean("variable_speed_checkbox", false);
+	    slow_down = settings.getBoolean("slow_down_checkbox", false);
+	    random_speed = settings.getBoolean("random_speed_checkbox", false);
+	    skip_stopwords = settings.getBoolean("skip_stopwords_checkbox", false);
+	    chunk_size = Integer.parseInt( settings.getString("chunk_size_edit_text", "1") );
+	    skip_vowels = settings.getBoolean("skip_vowels_checkbox", false);
+	    
 		
 		mBookmark = mPrefs.getInt(mFilePath+"bookmark",0);
 		
-		mWPM = mPrefs.getInt(mFilePath+"WPM",250);
+		//make the value to load if there is no saved setting the default set in the settings menu
+		mWPM = mPrefs.getInt(mFilePath+"WPM",default_wpm);
 		
 		
 		
+		mSpeedText.setText( mWPM+ " WPM");
+		mSpeedBar.setProgress(mWPM);
+		
+
 		
 		
 		
@@ -186,9 +402,9 @@ public class WordPlayerActivity extends Activity {
 		
 		 
 		
-		 //setup progress bar and text
-		 mProgressText = (TextView) findViewById(R.id.textViewPages);
-		 mProgressText.setText(mBookmark + "/" + mWordCount);
+//		 //setup progress bar and text
+//		 mProgressText = (TextView) findViewById(R.id.textViewPages);
+//		 mProgressText.setText(mBookmark + "/" + mWordCount);
 		 mProgressBar = (SeekBar) findViewById(R.id.progressBar);
 		 mProgressBar.setMax(mWordCount);
 		 mProgressBar.setProgress(mBookmark);
@@ -241,25 +457,29 @@ public class WordPlayerActivity extends Activity {
 		
 		
 		//setup wpm speed bar (top)
-		mSpeedText = (TextView) findViewById(R.id.textViewWPM);
-		mSpeedBar = (SeekBar) findViewById(R.id.wpmBar);
-		
-		mSpeedText.setText( mWPM+ " WPM");
-		mSpeedBar.setProgress(mWPM);
+//		mSpeedText = (TextView) findViewById(R.id.textViewWPM);
+//		mSpeedBar = (SeekBar) findViewById(R.id.wpmBar);
+//		
+//		mSpeedText.setText( mWPM+ " WPM");
+//		mSpeedBar.setProgress(mWPM);
 		mSpeedBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				// Log the progress
 				Log.d("DEBUG", "WPM is: "+progress);
 				//set textView's text
-				mSpeedText.setText(progress + " WPM");
-				mWPM = progress;
+				
+				
+				mSpeedText.setText( Integer.toString(progress + 50) + " WPM");
+				mWPM = progress+50;
 				ETA = ( (double)mWordCount - (double)mProgress ) / mWPM;
 				mProgressText.setText( 	mProgress + "/" + mWordCount +
 						" " + String.format("%.2f",pcnt) + "%" +
 						" ETA: "+String.format("%.2f",ETA) + "min"  
 						);
-			}
+				}
+			
+			
 
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -299,7 +519,7 @@ public class WordPlayerActivity extends Activity {
 		
 		
 		
-		mSystemUiHider = SystemUiHider.getInstance(this, contentView,HIDER_FLAGS);
+		mSystemUiHider = SystemUiHider.getInstance(this, wordsTxtView,HIDER_FLAGS);
 		mSystemUiHider.setup();
 
 		mSystemUiHider.setOnVisibilityChangeListener(new SystemUiHider.OnVisibilityChangeListener() {
@@ -359,7 +579,7 @@ public class WordPlayerActivity extends Activity {
 		
 		
 		// Set up the user interaction to manually show or hide the system UI.
-		contentView.setOnClickListener(new View.OnClickListener() {
+		wordsTxtView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (TOGGLE_ON_CLICK) {
@@ -383,7 +603,21 @@ public class WordPlayerActivity extends Activity {
 //				mDelayHideTouchListener);
 	}
 
-	
+	 public static ArrayList<String> split2(String line, int n){
+		    line+=" ";
+		    Pattern pattern = Pattern.compile("\\w*\\s");
+		    Matcher matcher = pattern.matcher(line);
+		    ArrayList<String> list = new ArrayList<String>();
+		    int i = 0;
+		    while (matcher.find()){
+		        if(i!=n)
+		            list.add(matcher.group());
+		        else
+		            break;
+		        i++;
+		    }
+		    return list;
+		}	
 	
 	
 	@Override
@@ -578,7 +812,12 @@ public class WordPlayerActivity extends Activity {
 			  e1.printStackTrace();
 		  }
 		  
+		  
+		  //add a space at end of line
+		  
 		  Pattern splitRegex = Pattern.compile(mSplitPattern);
+		  
+		  
 		  mWords = splitRegex.split(line);
 		  int b = 0;
 		  
@@ -670,8 +909,11 @@ public class WordPlayerActivity extends Activity {
 
 
 				  String line = mTextReader.readLine();
+				  
+				  
 
-				  //TODO make this regex changeable
+				  
+
 				  Pattern splitRegex = Pattern.compile(mSplitPattern);
 
 				  while(line != null){
@@ -679,6 +921,13 @@ public class WordPlayerActivity extends Activity {
 						  //grab the words from the line split it into an array based on the pattern
 						  if (mWords.length != 0 ){
 
+							  if(skip_stopwords){
+								  Pattern stopWords = Pattern.compile("\\b(?:i|a|and|about|an|are|the|about|across|after|afterwards|again|against|all|almost|alone|along|already|also|although|always|am|among|an|and|any|are|as|at|be|because|been|but|by|can|cannot|could|dear|did|do|does|either|else|ever|every|for|from|get|got|had|has|have|he|her|hers|him|his|how|however|i|if|in|into|is|it|its|just|least|let|like|likely|may|me|might|most|must|my|neither|no|nor|not|of|off|often|on|only|or|other|our|own|rather|said|say|says|she|should|since|so|some|than|that|the|their|them|then|there|these|they|this|tis|to|too|twas|us|wants|was|we|were|what|when|where|which|while|who|whom|why|will|with|would|yet|you|your )\\b\\s*", Pattern.CASE_INSENSITIVE);
+								  Matcher match = stopWords.matcher(line);
+								  line = match.replaceAll(" ");
+							  }
+							
+							  
 							  mWords = splitRegex.split(line);
 						  }
 
@@ -711,7 +960,69 @@ public class WordPlayerActivity extends Activity {
 
 								  //wpm/60000 = wpm in millis
 								  //int wpm = mWPM;
+								  //delay = 60000/mWPM;
 								  delay = 60000/mWPM;
+								  double percentAdjust = .5;
+								  double adjust = (delay * percentAdjust);
+								  Log.d(TAG,"initial delay: "+delay);
+
+								  //if variable speed is set, 
+								  if(variable_speed){
+									  
+									  //speed up if less then 5 the avg eng word length
+									  //slow down if over 5 in length
+									  if(word.length() >8){
+
+									  Log.d(TAG,"adjust: "+adjust);
+									  
+									  delay = delay + (int)adjust;
+									  Log.d(TAG,"delay: "+delay);
+									  }
+									  else if (word.length() <4){
+										  Log.d(TAG,"adjust: "+adjust);
+
+										  delay = delay - (int)adjust;
+										  Log.d(TAG,"delay: "+delay);
+
+									  }
+								  }
+								  //when slow down is checked in the settings, slow down on puncuation
+								  if(slow_down){
+									  Pattern punctuation = Pattern.compile( "[,-.\\!;:&\'\"]" );
+									  Matcher match = punctuation.matcher(word);
+									  	if (match.find()){
+									  		delay = delay + (int)adjust;
+									  	}
+								  }
+								  
+								  if(skip_vowels){
+									  if(word.length() > 4){
+									  Pattern vowels = Pattern.compile( "(a|e|i|o|u)",Pattern.CASE_INSENSITIVE );
+									  Matcher match = vowels.matcher(word);
+									  word = match.replaceAll("");
+									  }
+								  }
+								  //if random speed down is checked in the settings, randomly speed up or slow down
+								  if(random_speed){
+									  double randomPercent = .2 + (double)(Math.random()*.50);
+									  //get a randrom boolean
+									  boolean add = Math.random() < 0.5;
+									  if(add){
+										  delay = delay + (int)(delay * randomPercent);
+									  }
+									  else{//subtract
+										  delay = delay - (int)(delay * randomPercent);
+									  }
+									  
+								  }
+								  
+								  
+								  
+								  
+								  
+								  
+								  
+								  
 
 								  try {
 									  Thread.sleep(delay);

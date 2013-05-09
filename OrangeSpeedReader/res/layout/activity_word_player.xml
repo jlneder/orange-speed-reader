@@ -56,7 +56,7 @@ android:fitsSystemWindows.
                     android:id="@+id/wpmBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="1500"
+                    android:max="1550"
                     android:progress="300" />
 
             </LinearLayout>

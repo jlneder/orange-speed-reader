@@ -3,6 +3,7 @@ package com.duketek.orangespeedreader;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,12 +12,26 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import com.duketek.orangespeedreader.R;
 
+
+
+
 public class MainActivity extends Activity {
 
+	
+	public static final String PREFS_NAME = "OrangeSettings";
+	private SharedPreferences mPrefs;
+	
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putString("recent_book", "" );
+        editor.commit();
         
         
         //show that wonderful gridview we created
